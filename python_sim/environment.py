@@ -9,8 +9,13 @@ class Environment:
     def __init__(self, width, height, num_resources, num_organisms):
         self.width = width
         self.height = height
+        self.resources = None
+        self.organisms = None
+
         self.init_resources(num_resources)
         self.init_organisms(num_organisms)
+
+        print("Initialisation complete!")
 
     def init_resources(self, num_resources):
         self.resources = []
@@ -26,10 +31,14 @@ class Environment:
             x = random.randint(0, self.width)
             y = random.randint(0, self.height)
             angle = random.uniform(0, 2*math.pi)
-            organism = Organism(x, y, angle)
+            speed = random.uniform(5, 15)
+            organism = Organism(x, y, angle, speed)
             self.organisms.append(organism)
 
     def update(self):
+        """
+        Iterates through every Organism and runs .move() for every iteration
+        """
         for org in self.organisms:
             org.move(self.width, self.height)
-            org.consume_energy()
+            #org.consume_energy()
