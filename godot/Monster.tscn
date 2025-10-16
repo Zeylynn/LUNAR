@@ -1,0 +1,32 @@
+[gd_scene load_steps=5 format=3 uid="uid://dmgrnlmpjmhcg"]
+
+[ext_resource type="Texture2D" uid="uid://g0tfllfi34qq" path="res://skripte/Template222222.png" id="1_vb3nq"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ssiii"]
+atlas = ExtResource("1_vb3nq")
+region = Rect2(0, 0, 200, 200)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qheve"]
+atlas = ExtResource("1_vb3nq")
+region = Rect2(0, 200, 200, 200)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_eupxk"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ssiii")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_qheve")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[node name="Node2D" type="Node2D"]
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+position = Vector2(556, 657)
+scale = Vector2(2.49, 2.385)
+sprite_frames = SubResource("SpriteFrames_eupxk")
