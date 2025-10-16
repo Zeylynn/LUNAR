@@ -2,7 +2,7 @@
 
 class Food:
     def __init__(self, x, y):
-        # Zufällige Startposition
+        # float weil sie mit INT zufällige Positionen bekommen, ich aber alle x,y Werte in float haben will
         self.x = float(x)
         self.y = float(y)
 

@@ -9,11 +9,11 @@ import random
 
 class Organism:
     def __init__(self, x, y, angle, speed):
-        # Zufällige Startposition
+        # float weil sie mit INT zufällige Positionen bekommen, ich aber alle x,y Werte in float haben will
         self.x = float(x)
         self.y = float(y)
-        self.angle = float(angle)  # in radiant weil die meisten Mathematischen Funktionen radiant erwarten
-        self.speed = float(speed)
+        self.angle = angle  # in radiant weil die meisten Mathematischen Funktionen radiant erwarten
+        self.speed = speed
 
         # ATTRIBUTES
         self.energy = 100
@@ -31,7 +31,14 @@ class Organism:
         self.mutationRate = None
         self.layTime = None
         self.hatchTime = None
-        
+    
+    def is_on_water(self, terrain):
+        """prüft über das Terrain ob Wasser auf (x, y) ist oder nicht"""
+        grid_x = round(self.x)
+        grid_y = round(self.y)
+
+        return terrain[grid_y][grid_x] == 0    # TRUE wenn Wasser, FALSE wenn kein Wasser
+
     def move(self, width, height):
         # Zurzeit einfach random Movement
         self.angle += random.uniform(-0.5, 0.5)
