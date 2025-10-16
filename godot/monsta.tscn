@@ -1,0 +1,52 @@
+[gd_scene load_steps=6 format=3 uid="uid://bt2oxo6pfm36n"]
+
+[ext_resource type="Texture2D" uid="uid://g0tfllfi34qq" path="res://skripte/Template222222.png" id="1_wky4r"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_egqgx"]
+atlas = ExtResource("1_wky4r")
+region = Rect2(0, 200, 200, 200)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_j32d2"]
+atlas = ExtResource("1_wky4r")
+region = Rect2(0, 0, 200, 200)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_cjkyx"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_egqgx")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_j32d2")
+}],
+"loop": true,
+"name": &"default",
+"speed": 4.0
+}, {
+"frames": [],
+"loop": true,
+"name": &"new_1",
+"speed": 5.0
+}, {
+"frames": [],
+"loop": true,
+"name": &"new_animation",
+"speed": 5.0
+}]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_50tcm"]
+radius = 15.0
+
+[node name="Monsta" type="CharacterBody2D"]
+position = Vector2(0, 2)
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+position = Vector2(619.50006, 538.99994)
+scale = Vector2(6.1549997, 5.7499995)
+sprite_frames = SubResource("SpriteFrames_cjkyx")
+autoplay = "default"
+frame_progress = 0.6360314
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(504, 366)
+shape = SubResource("CircleShape2D_50tcm")
