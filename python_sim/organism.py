@@ -34,6 +34,7 @@ class Organism:
     
     def is_on_water(self, terrain):
         """prüft über das Terrain ob Wasser auf (x, y) ist oder nicht"""
+        #TODO ist es performant jedes mal das terrain zu übergeben, geht maybe anders
         grid_x = round(self.x)
         grid_y = round(self.y)
 

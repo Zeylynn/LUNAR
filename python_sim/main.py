@@ -1,8 +1,7 @@
-#TODO merge beide .gitignores(maybe)?
 #TODO config File auf Evolutionssimulator anpassen
-#TODO maybe Log File statt Debug Prints
-#TODO set_seed maybe bearbeiten, bin nicht ganz zufrieden
-#TODO is on water bearbeiten noch nicht ganz happy damit
+#TODO Multithreading/auslagern auf verschieden Cores/GPU
+#TODO implement Logger
+#TODO maybe Genom für über Wasser gehen, binäres Genom
 
 import random
 from environment import Environment
@@ -20,6 +19,7 @@ class Simulation:
         """
         Verhindert dass ein nicht nutzbarer Seed eingegeben wird,
         da die Funktion pnoise2 keine Fehlermeldung ausgibt wenn sie abstürzt
+        Wenn kein Seed eingeben ist wird ein zufälliger generiert
         """
         if seed == None:
             self.seed = random.randint(-9999, 500)
