@@ -1,10 +1,12 @@
-#TODO config File auf Evolutionssimulator anpassen
-#TODO Multithreading/auslagern auf verschieden Cores/GPU
-#TODO implement Logger
-#TODO maybe Genom für über Wasser gehen, binäres Genom
-
 import random
 from environment import Environment
+import logger_setup as log
+
+#TODO config File auf Evolutionssimulator anpassen
+#TODO Multithreading/auslagern auf verschieden Cores/GPU
+#TODO maybe Genom für über Wasser gehen, binäres Genom
+
+logger = log.get_logger(__name__)
 
 class Simulation:
     def __init__(self, width=100, height=100, num_resources=4, num_organisms=2, max_ticks=100, seed=None):
@@ -14,6 +16,8 @@ class Simulation:
 
         self.env = Environment(width=width, height=height, num_resources=num_resources, num_organisms=num_organisms, seed=seed)
         self.env.NoiseGen.visualize()   #TODO Remove Later
+
+        logger.info("Simulation initialized")
 
     def set_seed(self, seed):
         """
@@ -27,11 +31,12 @@ class Simulation:
             self.seed = seed
         else:
             raise ValueError('seed ist out of usable range! Usable range is -9999 to 500!')
+        logger.debug(f"Seed set as: {seed}")
 
     def run_tick(self):
         """Führt einen einzigen Tick aus"""
         self.env.update()
-        print(f"Tick {self.current_tick} has passed!")
+        logger.debug(f"Tick {self.current_tick} is currently running")
 
         # Organismen anzeigen
         for org in self.env.organisms:
@@ -46,7 +51,7 @@ class Simulation:
 
     def run(self):
         """Lässt soviele Ticks laufen wie self.max_ticks groß ist"""
-        print("Simulation Runs!")
+        logger.info("Simulation is running")
         while self.current_tick < self.max_ticks:
             self.run_tick()
             input("Press <SOMETHING> to continue")

@@ -3,9 +3,12 @@ from resources import Food
 from noise_runner import NoiseGenerator
 import random
 import math
+import logger_setup as log
 
 #TODO maybe Threshold einstellbar machen idk
+#TODO maybe eigene Logs für Organismen
 
+logger = log.get_logger(__name__)
 class Environment:
     def __init__(self, width, height, num_resources, num_organisms, seed):
         self.width = width
@@ -20,7 +23,7 @@ class Environment:
         self.init_resources(num_resources)
         self.init_organisms(num_organisms)
 
-        print("Initialisation complete!")
+        logger.info("Enviroment initialized")
 
     def init_resources(self, num_resources):
         self.resources = []
@@ -29,6 +32,7 @@ class Environment:
             y = random.randint(0, self.height)
             food = Food(x, y)
             self.resources.append(food)
+        logger.info("Resources initialized")
 
     def init_organisms(self, num_organisms):
         self.organisms = []
@@ -39,6 +43,7 @@ class Environment:
             speed = random.uniform(5, 15)
             organism = Organism(x, y, angle, speed)
             self.organisms.append(organism)
+        logger.info("Organisms initialized")
 
     def update(self):
         """Iterates through every Organism and runs .move() for every iteration"""

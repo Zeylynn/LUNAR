@@ -1,6 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from noise import pnoise2
+import logger_setup as log
+
+logger = log.get_logger(__name__)
 
 class NoiseGenerator:
     def __init__(self, world_width, world_height, seed, scale=10.0, octaves=4, persistence=0.5, lacunarity=2.0, threshold=0.0):
@@ -48,6 +51,7 @@ class NoiseGenerator:
                 f"Falsche Weltgröße: erwartet ({self.world_height}x{self.world_width}), "
                 f"aber erhalten ({actual_height}x{actual_width})."
             )
+        logger.debug(f"Noise World generated with size: ({actual_height}, {actual_width})")
 
     def generate_terrain(self):
         """Wandel die NoiseMap in einen Array mit 0=Wasser und 1=Land um"""
