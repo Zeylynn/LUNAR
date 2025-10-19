@@ -28,8 +28,8 @@ class Environment:
     def init_resources(self, num_resources):
         self.resources = []
         for _ in range(num_resources):
-            x = random.randint(0, self.width)
-            y = random.randint(0, self.height)
+            x = random.uniform(0, self.width)   # Exkludiert self.width deswegen ist die Spawnrange 0-99.999...
+            y = random.uniform(0, self.height)
             food = Food(x, y)
             self.resources.append(food)
         logger.info("Resources initialized")
@@ -37,11 +37,12 @@ class Environment:
     def init_organisms(self, num_organisms):
         self.organisms = []
         for _ in range(num_organisms):
-            x = random.randint(0, self.width)
-            y = random.randint(0, self.height)
+            x = random.uniform(0, self.width)   # Exkludiert self.width deswegen ist die Spawnrange 0-99.999...
+            y = random.uniform(0, self.height)
             angle = random.uniform(0, 2*math.pi)
             speed = random.uniform(5, 15)
-            organism = Organism(x, y, angle, speed)
+            vision_level = random.uniform(0, 1)
+            organism = Organism(x, y, angle, speed, vision_level, self.terrain)
             self.organisms.append(organism)
         logger.info("Organisms initialized")
 

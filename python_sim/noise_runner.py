@@ -3,13 +3,14 @@ import matplotlib.pyplot as plt
 from noise import pnoise2
 import logger_setup as log
 
+#TODO Random Buschgeneration einbauen
+
 logger = log.get_logger(__name__)
 
 class NoiseGenerator:
     def __init__(self, world_width, world_height, seed, scale=10.0, octaves=4, persistence=0.5, lacunarity=2.0, threshold=0.0):
-        # +1 damit der Array gleich groß ist wie die Welt
-        self.world_width = world_width + 1
-        self.world_height = world_height + 1 
+        self.world_width = world_width
+        self.world_height = world_height
 
         # Noise Attributes
         self.scale = scale

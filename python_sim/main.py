@@ -41,7 +41,6 @@ class Simulation:
         # Organismen anzeigen
         for org in self.env.organisms:
             print(org)
-            print(f"Organismus ist auf Wasser: {org.is_on_water(self.env.terrain)}")
 
         # Ressourcen anzeigen
         for res in self.env.resources:
