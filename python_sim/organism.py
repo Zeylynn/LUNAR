@@ -10,9 +10,9 @@ import random
 
 class Organism:
     def __init__(self, x, y, angle, speed, vision_level, terrain):
-        # float weil sie mit INT zufällige Positionen bekommen, ich aber alle x,y Werte in float haben will
-        self.x = float(x)
-        self.y = float(y)
+        # ATTRIBUTE
+        self.x = x
+        self.y = y
         self.angle = angle  # in radiant weil die meisten Mathematischen Funktionen radiant erwarten
         self.speed = speed
         self.vision_level = vision_level
@@ -20,7 +20,7 @@ class Organism:
 
         self.update_vision()
 
-        # ATTRIBUTES
+        # ATTRIBUTES - UNUSED
         self.energy = 100
         self.food = 100
         self.water = 100
@@ -54,8 +54,8 @@ class Organism:
         self.vision_range = self.lerp(1.0, 20.0, self.vision_level)
 
     def seen_resources(self):
-        visible = []
-        #TODO implementieren, zuerst aber Busch/Food generation
+        """Liste der Ressourcen in Sichtreichweite"""
+        #TODO implementieren
     
     def is_on_water(self):
         """prüft über das Terrain ob Wasser auf (x, y) ist oder nicht"""
@@ -69,7 +69,14 @@ class Organism:
         else:
             return False    
 
+    def eat(self):
+        """Kreaturen essen halt"""
+        #TODO implementiere dass Kreaturen essen können 
+
     def move(self, width, height):
+        """
+        Organismus bewegt sich um zufällige x, y Koordinaten und verliert Energie
+        """
         # Zurzeit einfach random Movement
         self.angle += random.uniform(-0.5, 0.5)
         
@@ -77,7 +84,7 @@ class Organism:
         self.x += math.cos(self.angle) * self.speed
         self.y += math.sin(self.angle) * self.speed
         
-        # checkt ob der Organismus an der Border ist
+        # der Organismus muss innerhalb 0 und width - 1e-6 bleiben
         self.x = max(0, min(self.x, width - 1e-6))  # Gültiger Bereich zum Moven 0-99.999...
         self.y = max(0, min(self.y, height - 1e-6))
 

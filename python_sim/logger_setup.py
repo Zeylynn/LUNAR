@@ -52,7 +52,7 @@ def get_logger(name):
 
     # Falls diese Methode 2x mit demselben Logger-Namen aufgerufen wird, wird nicht noch ein FileHandler hinzugefügt
     if not logger.handlers:
-        file_handler = logging.FileHandler(log_name, mode='a', encoding='utf-8')                              # Handeled wo das File hingespeichert wird, etc.
+        file_handler = logging.FileHandler(log_name, mode="a", encoding="utf-8")                              # Handeled wo das File hingespeichert wird, etc.
         formatter = logging.Formatter('%(asctime)s - %(filename)s - %(levelname)s - %(message)s')   # Handeled welche Formatierung die Log-Einträge haben soll, etc.
         file_handler.setFormatter(formatter)        # => %Filename => Immer der Name des Files, %name => im Endeffekt __name__
         logger.addHandler(file_handler)
@@ -68,8 +68,8 @@ __file__ ist IMMER der absolute Pfad der Datei wo der Code AUSGEFÜHRT WIRD
 """
 if __name__ == "__main__":
     logger = get_logger(__name__)
-    logger.debug('This message should go to the log file')
-    logger.info('So should this')
-    logger.warning('And this, too')
-    logger.error('And non-ASCII stuff, too, like Øresund and Malmö')
+    logger.debug("This message should go to the log file")
+    logger.info("So should this")
+    logger.warning("And this, too")
+    logger.error("And non-ASCII stuff, too, like Øresund and Malmö")
     logger.critical("Oh no :(, Error!")
