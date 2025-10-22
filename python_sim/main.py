@@ -3,9 +3,10 @@ import logger_setup as log
 
 #TODO config File auf Evolutionssimulator anpassen
 #TODO Multithreading/auslagern auf verschieden Cores/GPU
-#TODO maybe Genom für über Wasser gehen, binäres Genom
-#TODO vielleicht eine Object Klasse als Basis für Organismen, Food mit .destroy() und Koordinaten usw.
-#TODO überlegen ob ich alle Attribute private oder so machen soll
+#NOTE maybe Genom für über Wasser gehen, binäres Genom
+#NOTE vielleicht eine Object Klasse als Basis für Organismen, Food mit .destroy() und Koordinaten usw.
+#NOTE überlegen ob ich alle Attribute private oder so machen soll
+#NOTE wie trainiere ich das Programm dann am KI-Server
 
 logger = log.get_logger(__name__)
 
@@ -15,7 +16,7 @@ class Simulation:
         self.current_tick = 0
 
         self.env = Environment(width=width, height=height, num_organisms=num_organisms, num_bushes=num_bushes, seed=seed)
-        self.env.WorldGen.visualize()   #TODO Remove Later
+        self.env.WorldGen.visualize()   #NOTE Remove Later
 
         logger.info("Simulation initialized")
 

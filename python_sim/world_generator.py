@@ -5,8 +5,6 @@ import logger_setup as log
 import random
 from resources import Bush
 
-#TODO Logik nochmal übedenken
-
 logger = log.get_logger(__name__)
 
 class WorldGenerator:
@@ -23,6 +21,7 @@ class WorldGenerator:
         self.lacunarity = lacunarity
 
         self.seed = seed
+        self.num_bushes = num_bushes
 
         # Enviroment initialisieren
         self.world = np.zeros((self.world_height, self.world_width))    # => ein Array gefüllt mit [[0, 0], [0, 0], ...]
@@ -134,7 +133,7 @@ class WorldGenerator:
         return bushes
 
     def visualize(self):
-        #TODO Remove Later
+        #NOTE Remove Later
         height = len(self.terrain)
         width = len(self.terrain[0])
         terrain_array = np.zeros((height, width))

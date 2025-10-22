@@ -1,9 +1,8 @@
 from organism import Organism
-from python_sim.world_generator import WorldGenerator
+from world_generator import WorldGenerator
 import random
 import math
 import logger_setup as log
-from resources import Bush
 
 #TODO maybe eigene Logs für Organismen
 
@@ -62,7 +61,7 @@ class Environment:
             self.seed = seed
         else:
             raise ValueError("seed ist out of usable range! Usable range is -9999 to 500!")
-        logger.debug(f"Seed set as: {seed}")
+        logger.debug(f"Seed set as: {self.seed}")
 
     def update(self):
         """
@@ -70,14 +69,9 @@ class Environment:
         - Organism-Obj und führt .move() aus
         - Bush-Obj und führt .update() aus
         """
-        # Bewegt alle Organismen
         for org in self.organisms:
             org.move(self.width, self.height)
             #org.consume_energy()
 
-        # Updated alle Büsche
-        for row in self.terrain:
-            for tile in row:
-                obj = tile["object"]
-                if isinstance(obj, Bush):       # Prüft ob der Eintrag "object" vom Typ Bush ist
-                    obj.update()                # Food wächst 
+        for bush in self.bushes:
+            bush.update()

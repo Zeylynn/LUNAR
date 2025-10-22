@@ -1,5 +1,3 @@
-#TODO Food generiert in der Nähe von "Bäumen" anstatt einfach so
-
 class Bush:
     def __init__(self, x, y, max_food=5, regen_rate=0.01):
         # float damit man u.a. mit Organismus Koordinaten vergleichen kann
@@ -39,7 +37,7 @@ class Bush:
 class Food:
     def __init__(self, x, y):
         # float weil sie mit INT zufällige Positionen bekommen, ich aber alle x,y Werte in float haben will
-        #TODO Food implementieren/removen
+        #TODO Food implementieren/removen => in der Nähe von Bäumen wachsen
         self.x = float(x)
         self.y = float(y)
 

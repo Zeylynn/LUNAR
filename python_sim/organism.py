@@ -6,7 +6,7 @@ import random
 #TODO eigene Funktion für Energieverbrauch
 #TODO bei Energy = 0 sterben sie
 #TODO Angle muss zischen 2Pi und 0 bleiben => zurzeit bleibt der Angle immer ca. gleich vielleicht Rotation reinmachen
-#TODO maybe isWater ist ein Attirbut was automatisch gesetzt wird?
+#NOTE maybe isWater ist ein Attirbut was automatisch gesetzt wird?
 
 class Organism:
     def __init__(self, x, y, angle, speed, vision_level, terrain):
@@ -80,7 +80,6 @@ class Organism:
         # Zurzeit einfach random Movement
         self.angle += random.uniform(-0.5, 0.5)
         
-        #TODO Die Mathematik nachprüfen
         self.x += math.cos(self.angle) * self.speed
         self.y += math.sin(self.angle) * self.speed
         
