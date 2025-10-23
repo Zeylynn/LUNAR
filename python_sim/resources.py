@@ -6,14 +6,20 @@ class Bush:
         self.food = max_food
         self.max_food = max_food
         self.regen_rate = regen_rate
+        self.nutrition = 100                # Wie viel Energie ein "Apfel" auffüllt
 
     def update(self):
         """aktualisiert self.food um die self.regen_rate, bis zu einem maximum von self.max_food"""
         self.food = min(self.max_food, self.food + self.regen_rate)
 
-    def harvest(self):
-        pass
-        #TODO implementieren dass Organismen Food essen können
+    def harvest(self, amount: int):
+        """Entfernt die Menge in amount von self.food, gibt zurück wie viel entnommen wurde"""
+        if type(amount) != int:     # Es können nur "ganze" Früchte entfernt werden
+            raise ValueError("amount muss vom Typ integer sein, weil nur 'ganze' Früchte geerntet werden können")
+        
+        harvested = min(int(self.food), amount)     # Damit nicht mehr geerntet wird als verfügbar
+        self.food -= harvested
+        return harvested
 
     def is_empty(self):
         """
@@ -33,17 +39,3 @@ class Bush:
             MaxFood: {self.max_food},
             Food: {self.food},
             RegenRate {self.regen_rate})"""
-
-class Food:
-    def __init__(self, x, y):
-        # float weil sie mit INT zufällige Positionen bekommen, ich aber alle x,y Werte in float haben will
-        #TODO Food implementieren/removen => in der Nähe von Bäumen wachsen
-        self.x = float(x)
-        self.y = float(y)
-
-        self.size = 1
-
-    def __str__(self):
-        return f"""Food(
-            Pos X: {self.x},
-            Pos Y: {self.y})"""

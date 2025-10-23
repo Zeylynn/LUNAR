@@ -18,7 +18,7 @@ class Environment:
         self.organisms = None
         self.bushes = None
 
-        #TODO maybe Threshold einstellbar machen idk
+        #NOTE maybe Threshold einstellbar machen idk
         self.WorldGen = WorldGenerator(world_width=self.width, world_height=self.height, seed=self.seed, num_bushes=num_bushes, threshold=-0.15)
         self.WorldGen.init_world()
         self.terrain = self.WorldGen.get_terrain()
@@ -33,12 +33,21 @@ class Environment:
         Erstellt {num_organisms} viele Organismen
         - Jedes Attribut wird zufällig zugewiesen
         - gibt eine Liste an Organismen zurück
+        - Organismen können nicht auf Wasser generieren
         """
-        #TODO so machen dass Lebewesen nicht auf Wasser generieren können
         organisms = []
         for _ in range(num_organisms):
-            x = random.uniform(0, self.width)   # Exkludiert self.width deswegen ist die Spawnrange 0-99.999...
-            y = random.uniform(0, self.height)
+            while True:
+                x = random.uniform(0, self.width)   # Exkludiert self.width deswegen ist die Spawnrange 0-99.999...
+                y = random.uniform(0, self.height)
+
+                grid_x = int(x)
+                grid_y = int(y)
+
+                # Bricht die Schleife ab wenn auf Land gespawnt ist
+                if self.terrain[grid_y][grid_x]["terrain"] == 1:
+                    break
+            
             angle = random.uniform(0, 2*math.pi)
             speed = random.uniform(5, 15)
             vision_level = random.uniform(0, 1)
@@ -66,12 +75,12 @@ class Environment:
     def update(self):
         """
         Iteriert durch jedes
-        - Organism-Obj und führt .move() aus
+        - Organism-Obj und führt .move() & .metabolism() aus
         - Bush-Obj und führt .update() aus
         """
         for org in self.organisms:
             org.move(self.width, self.height)
-            #org.consume_energy()
+            org.metabolism()
 
         for bush in self.bushes:
             bush.update()
