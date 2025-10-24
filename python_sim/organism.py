@@ -3,7 +3,6 @@ import random
 
 #TODO maybe Wasser / Food Threshold einbauen
 #TODO bei Life = 0 sterben sie, Life einbauen
-#TODO Angle muss zischen 2Pi und 0 bleiben => zurzeit bleibt der Angle immer ca. gleich vielleicht Rotation reinmachen
 #NOTE maybe isWater ist ein Attirbut was automatisch gesetzt wird?
 #NOTE maybe eigene Funktion für Energieverbrauch
 
@@ -44,6 +43,17 @@ class Organism:
         """Lineare Interpolation, z.B. für die Vision"""
         return a + (b - a) * t
 
+    def normalize_angle(angle):
+        """
+        Normalisiert einen Winkel auf den Bereich [-pi, +pi].
+        z.B. ein Winkel von 9rad ~ 3pi wird zu 3rad ~ pi, ich bekomme immer die kleinste Rotation
+        """
+        while angle > math.pi:
+            angle -= 2 * math.pi
+        while angle < -math.pi:
+            angle += 2 * math.pi
+        return angle
+
     def update_vision(self):
         """
         setzt von vision_level abhängig die fov und range
@@ -64,8 +74,10 @@ class Organism:
         Erkennt 'Bush' (Food) und Wasser anhand des Terrains.
         Gibt ein Dict mit 'food' und 'water' zurück.
         """
+        #NOTE maybe visible_water, etc. als Attribut machen
         visible_food = []
         visible_water = []
+        #visible_tiles = []         wäre zur Visualisierung von dem Sichtfeld
         half_fov = self.fov / 2  # halber Sichtwinkel
 
         height = len(self.terrain)
@@ -87,17 +99,20 @@ class Organism:
                     continue
 
                 # Winkel zwischen Blickrichtung und Tile
-                #TODO die Mathematik umschreiben weil ichs nicht check
                 angle_to_tile = math.atan2(dy, dx)
-                angle_diff = (angle_to_tile - self.angle + math.pi) % (2 * math.pi) - math.pi
+                raw_diff = angle_to_tile - self.angle
 
-                # Prüfen, ob innerhalb Sichtfeld
+                # Normalisiert => kürzeste Drehung
+                angle_diff = self.normalize_angle(raw_diff)
+
+                # Prüfen, ob innerhalb Sichtfeld, abs() entfernt Vorzeichen
                 if abs(angle_diff) <= half_fov:
                     # Wasser oder Food erkennen
                     if tile["terrain"] == 0:
                         visible_water.append((x, y))
                     elif tile["object"] == "Bush":
                         visible_food.append((x, y))
+                    #visible_tiles.append((x, y))               wäre zur Visualisierung von dem Sichtfeld
 
         return {
             "food": visible_food,
@@ -159,6 +174,8 @@ class Organism:
         """
         # Zurzeit einfach random Movement
         self.angle += random.uniform(-0.5, 0.5)
+
+        self.angle = self.normalize_angle(self.angle)
 
         old_x = self.x
         old_y = self.y
