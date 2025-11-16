@@ -72,6 +72,54 @@ class Environment:
             raise ValueError("seed ist out of usable range! Usable range is -9999 to 500!")
         logger.debug(f"Seed set as: {self.seed}")
 
+    def get_inputs(self, organism):
+        """
+        Liefert eine normalisierte Liste an Sensorwerten für das neuronale Netz.
+        """
+        #TODO Verifizieren
+        seen = organism.seen_resources()
+        nearest_food = len(seen["food"]) / 10.0
+        nearest_water = len(seen["water"]) / 10.0
+
+        return [
+            organism.energy / organism.max_energy,
+            organism.food / 10.0,
+            organism.water / 10.0,
+            nearest_food,
+            nearest_water,
+            organism.speed / 15.0,
+            organism.x / self.width,
+            organism.y / self.height
+        ]
+    
+    def apply_nn_output(self, organism, output):
+        """
+        Führt die NN-Ausgabe für einen Organismus aus.
+        Steuerung, Interaktion und Energieverbrauch werden hier behandelt.
+        """
+        turn_left, turn_right, move_forward, interact = output
+
+        #Bewegung & Richtung
+        if turn_left > 0.5:
+            organism.angle -= 0.2
+        if turn_right > 0.5:
+            organism.angle += 0.2
+        if move_forward > 0.5:
+            organism.move(self.width, self.height)
+
+        #Interaktion mit Wasser oder Bush
+        if interact > 0.5:
+            if organism.is_on_water(self.terrain):
+                organism.drink()
+            else:
+                for bush in self.bushes:
+                    if abs(bush.x - organism.x) < 1 and abs(bush.y - organism.y) < 1:
+                        bush.harvest(organism)
+                        break
+
+        #Grundumsatz (Metabolismus)
+        organism.metabolism()
+
     def update(self):
         """
         Iteriert durch jedes

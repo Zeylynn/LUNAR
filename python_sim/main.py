@@ -4,6 +4,7 @@ import logger_setup as log
 #TODO config File auf Evolutionssimulator anpassen
 #TODO Multithreading/auslagern auf verschieden Cores/GPU
 #TODO Neat an Organismen anpassen/implementieren
+#TODO RNNs für Memeory => wo war Wasser, wo war Food
 #NOTE maybe Genom für über Wasser gehen, binäres Genom
 #NOTE vielleicht eine Object Klasse als Basis für Organismen, Food mit .destroy() und Koordinaten usw.
 #NOTE überlegen ob ich alle Attribute private oder so machen soll

@@ -43,7 +43,7 @@ class Organism:
         """Lineare Interpolation, z.B. für die Vision"""
         return a + (b - a) * t
 
-    def normalize_angle(angle):
+    def normalize_angle(self, angle):
         """
         Normalisiert einen Winkel auf den Bereich [-pi, +pi].
         z.B. ein Winkel von 9rad ~ 3pi wird zu 3rad ~ pi, ich bekomme immer die kleinste Rotation
@@ -194,6 +194,34 @@ class Organism:
         # Energieverbrauch: proportional zur Distanz und Geschwindigkeit
         energy_cost = distance * self.speed * 0.5
         self.energy = max(0.0, self.energy - energy_cost)
+
+    def apply_nn_output(self, output, environment):
+        """
+        Nimmt die Ausgabe des neuronalen Netzes und führt entsprechende Aktionen aus.
+        Output ist ein Array wie [turn_left, turn_right, move_forward, interact].
+        """
+        turn_left, turn_right, move_forward, interact = output
+
+        # Bewegung / Drehung
+        if turn_left > 0.5:
+            self.angle -= 0.2
+        if turn_right > 0.5:
+            self.angle += 0.2
+        if move_forward > 0.5:
+            self.move(environment.width, environment.height)
+
+        # Interaktion mit Umgebung
+        if interact > 0.5:
+            if self.is_on_water(environment.terrain):
+                self.drink()
+            else:
+                for bush in environment.bushes:
+                    if abs(bush.x - self.x) < 1 and abs(bush.y - self.y) < 1:
+                        bush.harvest(self)
+                        break
+
+        # Metabolismus
+        self.metabolism()
 
     def __str__(self):
         return f"""Organism(
