@@ -1,14 +1,12 @@
-[gd_scene load_steps=7 format=3 uid="uid://k0u2g0g76btd"]
+[gd_scene load_steps=5 format=3 uid="uid://k0u2g0g76btd"]
 
-[ext_resource type="PackedScene" uid="uid://bt2oxo6pfm36n" path="res://monsta.tscn" id="2_lnu2h"]
 [ext_resource type="AudioStream" uid="uid://bs2tb4tsqhjx0" path="res://freeorg.mp3" id="2_yqjtg"]
-[ext_resource type="PackedScene" uid="uid://dr6e0aig5mhh6" path="res://90.tscn" id="3_lbhrr"]
-[ext_resource type="PackedScene" uid="uid://dpk6g6h3ljnam" path="res://180.tscn" id="4_iywne"]
-[ext_resource type="PackedScene" uid="uid://bjt2x0qotp6c5" path="res://wassa.tscn" id="5_p57ef"]
+[ext_resource type="Texture2D" uid="uid://k4cf4w2hxgld" path="res://Background.png" id="3_lbhrr"]
+[ext_resource type="PackedScene" uid="uid://bqve0krec0yfo" path="res://ZweitesMonster.tscn" id="4_iywne"]
 [ext_resource type="PackedScene" uid="uid://c1wjtek8b4tq2" path="res://Apfel.tscn" id="6_u5sy4"]
 
 [node name="Game" type="Node2D"]
-position = Vector2(-60, -257)
+position = Vector2(1450, 812)
 
 [node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="."]
 position = Vector2(671, -749)
@@ -20,36 +18,9 @@ position = Vector2(534, -820)
 stream = ExtResource("2_yqjtg")
 autoplay = true
 
-[node name="Monsta" parent="." instance=ExtResource("2_lnu2h")]
-position = Vector2(-397.00003, -404.99997)
-
 [node name="Camera2D" type="Camera2D" parent="."]
 offset = Vector2(4, 4)
 zoom = Vector2(0.4, 0.4)
-
-[node name="Monsta3" parent="." instance=ExtResource("2_lnu2h")]
-position = Vector2(649, -985)
-
-[node name="Monsta4" parent="." instance=ExtResource("2_lnu2h")]
-position = Vector2(-1664, 144)
-
-[node name="CharacterBody2D" parent="." instance=ExtResource("3_lbhrr")]
-position = Vector2(-429, 538)
-
-[node name="CharacterBody2D2" parent="." instance=ExtResource("4_iywne")]
-position = Vector2(309, -1001)
-
-[node name="CharacterBody2D3" parent="." instance=ExtResource("5_p57ef")]
-position = Vector2(-1811, -355)
-
-[node name="CharacterBody2D4" parent="." instance=ExtResource("5_p57ef")]
-position = Vector2(-976, -742)
-
-[node name="CharacterBody2D5" parent="." instance=ExtResource("5_p57ef")]
-position = Vector2(187, -327)
-
-[node name="CharacterBody2D6" parent="." instance=ExtResource("5_p57ef")]
-position = Vector2(-1002, 166)
 
 [node name="CharacterBody2D7" parent="." instance=ExtResource("6_u5sy4")]
 position = Vector2(-1245, 193)
@@ -93,8 +64,32 @@ position = Vector2(779, 282)
 [node name="CharacterBody2D20" parent="." instance=ExtResource("6_u5sy4")]
 position = Vector2(1234, 453)
 
-[node name="Monsta2" parent="." instance=ExtResource("2_lnu2h")]
-position = Vector2(-1647, -928)
+[node name="Sprite2D" type="Sprite2D" parent="."]
+z_index = -4096
+position = Vector2(11.374963, 3.8750186)
+scale = Vector2(3.619538, 2.6747935)
+texture = ExtResource("3_lbhrr")
 
-[node name="Monsta5" parent="." instance=ExtResource("2_lnu2h")]
-position = Vector2(459, 228)
+[node name="CharacterBody2D3" parent="." instance=ExtResource("4_iywne")]
+position = Vector2(-1702, -794)
+
+[node name="CharacterBody2D" parent="." instance=ExtResource("4_iywne")]
+position = Vector2(-1753, 200)
+
+[node name="CharacterBody2D2" parent="." instance=ExtResource("4_iywne")]
+position = Vector2(-802, 272)
+
+[node name="CharacterBody2D4" parent="." instance=ExtResource("4_iywne")]
+position = Vector2(-151, 251)
+
+[node name="CharacterBody2D5" parent="." instance=ExtResource("4_iywne")]
+position = Vector2(13, -289)
+
+[node name="CharacterBody2D6" parent="." instance=ExtResource("4_iywne")]
+position = Vector2(679, 231)
+
+[node name="CharacterBody2D21" parent="." instance=ExtResource("4_iywne")]
+position = Vector2(-767, -961)
+
+[node name="CharacterBody2D22" parent="." instance=ExtResource("4_iywne")]
+position = Vector2(613, -291)
