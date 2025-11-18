@@ -1,51 +1,50 @@
-# neat_runner.py
 import neat
-import random
 from environment import Environment
 from organism import Organism
 
-WIDTH, HEIGHT = 500, 500
-
 def eval_genomes(genomes, config):
+    """
+    Bewertet jedes Genom in der Population anhand seiner Performance im Environment.
+    """
     for genome_id, genome in genomes:
         net = neat.nn.FeedForwardNetwork.create(genome, config)
-        env = Environment(WIDTH, HEIGHT)
-        org = Organism(random.uniform(0, WIDTH), random.uniform(0, HEIGHT))
+        env = Environment(width=100, height=100, num_resources=10, num_organisms=0)
+        organism = Organism(
+            x=50, y=50, angle=0, speed=5, vision_level=0.5, terrain=env.terrain
+        )
+
         fitness = 0
+        for _ in range(500):  # Simulationsschritte
+            inputs = env.get_inputs(organism)
+            outputs = net.activate(inputs)
+            organism.apply_nn_output(outputs, env)
+            env.update()
 
-        for _ in range(50):  # simulation steps
-            food = env.get_closest_food(org)
-            # Normalize inputs to 0..1
-            inputs = [
-                (food[0] - org.x)/WIDTH,
-                (food[1] - org.y)/HEIGHT,
-                org.energy/100
-            ]
-            output = net.activate(inputs)
-            # output[0] -> dx, output[1] -> dy
-            org.move(output[0]*5, output[1]*5, WIDTH, HEIGHT)
+            # Wenn tot → abbrechen
+            if organism.energy <= 0:
+                break
 
-            # Simple fitness: closer to food is better
-            dist = org.distance_to_food(food)
-            fitness += max(0, 10 - dist)  # the closer, the higher
+            # Fitness = Energie + Entfernung zu Food
+            seen = organism.seen_resources()
+            fitness += organism.energy * 0.01 + len(seen["food"]) * 0.1
 
         genome.fitness = fitness
 
-def run(config_file):
+def run_neat(config_path):
     config = neat.Config(
         neat.DefaultGenome,
         neat.DefaultReproduction,
         neat.DefaultSpeciesSet,
         neat.DefaultStagnation,
-        config_file
+        config_path
     )
 
-    p = neat.Population(config)
-    p.add_reporter(neat.StdOutReporter(True))
-    p.add_reporter(neat.StatisticsReporter())
+    population = neat.Population(config)
+    population.add_reporter(neat.StdOutReporter(True))
+    stats = neat.StatisticsReporter()
+    population.add_reporter(stats)
 
-    winner = p.run(eval_genomes, 10)  # run 10 generations
-    print("Best genome:", winner)
+    winner = population.run(eval_genomes, n=50)
 
-if __name__ == "__main__":
-    run("config-feedforward.txt")
+    print("\n🏆 Beste Fitness:", winner.fitness)
+    print("Simulation abgeschlossen!")
