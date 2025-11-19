@@ -1,0 +1,1 @@
+#TODO Evolution einbauen, also Attribute bei Fortpflanzung leicht ändern

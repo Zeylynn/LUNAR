@@ -2,37 +2,33 @@
 # neat-python\examples\openai-lander
 
 [NEAT]
-pop_size              = 20
+# Wie viele NNs pro Gen trainiert werden
+pop_size              = 100     
+# [min, max, mean]      max => höchste Fitness wird weitertrainert, min => niedrigste -" "-
+fitness_criterion     = max     
 # Note: the fitness threshold will never be reached because
 # we are controlling the termination ourselves based on simulation performance.
-fitness_criterion     = max
-fitness_threshold     = 1000.0
-
+# Sobald ein NN diese Fitness erreicht, Training beenden
+fitness_threshold     = 1000
 no_fitness_termination = True
+
 reset_on_extinction   = False
 
-[DefaultStagnation]
-species_fitness_func = mean
-max_stagnation       = 15
-species_elitism      = 4
-
-[DefaultReproduction]
-elitism            = 2
-survival_threshold = 0.2
-min_species_size = 2
-
-[DefaultSpeciesSet]
-compatibility_threshold = 3.0
-
+# Ein Genome ist ein NN, jedes NN startet mit diesen Werten
 [DefaultGenome]
-activation_default      = sigmoid
+# node activation options
+activation_default      = tanh
+#Die Chance, eine Aktivierungsfunktion zufällig zu ändern
 activation_mutate_rate  = 0.0
-activation_options      = clamped
+# Nur relevant wenn activation_mutate_rate > 0.0
+activation_options      = tanh sigmoid
 
+# node aggregation options
 aggregation_default     = sum
 aggregation_mutate_rate = 0.0
 aggregation_options     = sum
 
+# node bias options
 bias_init_mean          = 0.0
 bias_init_stdev         = 1.0
 bias_init_type          = normal
@@ -42,26 +38,36 @@ bias_mutate_power       = 0.4
 bias_mutate_rate        = 0.8
 bias_replace_rate       = 0.02
 
+# genome compatibility options
 compatibility_disjoint_coefficient = 1.0
 compatibility_weight_coefficient   = 1.0
 
-conn_add_prob           = 0.15
-conn_delete_prob        = 0.1
+# connection add/remove rates
+conn_add_prob           = 0.3
+conn_delete_prob        = 0.3
+
+# connection enable options
 enabled_default         = True
 enabled_mutate_rate     = 0.01
 enabled_rate_to_false_add = 0
 enabled_rate_to_true_add = 0
 
-feed_forward            = True
+#NOTE da dann auf RNN switchen
+feed_forward            = True      
+# Am Anfang sind alle Layers miteinander verbunden
 initial_connection      = full
-node_add_prob           = 0.15
-node_delete_prob        = 0.1
 
-#NOTE da die Anzahl an Inputs/Outputs ändern
+# node add/remove rates
+node_add_prob           = 0.2
+node_delete_prob        = 0.2
+
+# network parameters
 num_hidden              = 0
-num_inputs              = 8
+#NOTE da die Anzahl an Inputs/Outputs ändern
+num_inputs              = 12
 num_outputs             = 4
 
+# node response options
 response_init_mean      = 1.0
 response_init_stdev     = 0.0
 response_init_type      = normal
@@ -74,6 +80,7 @@ response_replace_rate   = 0.0
 single_structural_mutation = False
 structural_mutation_surer = False
 
+# connection weight options
 weight_init_mean        = 0.0
 weight_init_stdev       = 1.0
 weight_init_type        = normal
@@ -82,3 +89,19 @@ weight_min_value        = -30
 weight_mutate_power     = 0.4
 weight_mutate_rate      = 0.8
 weight_replace_rate     = 0.02
+
+[DefaultSpeciesSet]
+compatibility_threshold = 3.0
+
+[DefaultStagnation]
+species_fitness_func = mean
+# Wenn in dieser Spezies 15 Gens vergehen ohne Fitness zu erhöhen. Terminiere Spezies
+max_stagnation       = 15        
+species_elitism      = 4
+
+[DefaultReproduction]
+elitism            = 2
+survival_threshold = 0.2
+min_species_size = 2
+
+
