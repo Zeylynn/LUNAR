@@ -111,7 +111,7 @@ class WorldGenerator:
 
             #NOTE maybe implementieren dass ein gewisser Abstand zwischen den Büschen sein muss
 
-            # Wenn frei → Busch platzieren
+            # Wenn frei => Busch platzieren
             self.terrain[y][x]["object"] = Bush(x, y)
             bushes += 1
         logger.debug(f"Added {bushes} bushes into terrain grid")

@@ -28,7 +28,19 @@ class Bush:
             return True
         else:
             return False
-        
+    
+    def to_dict(self):
+        """Return JSON-serializable dictionary of the bush"""
+        return {
+            "type": "Bush",
+            "x": int(self.x),
+            "y": int(self.y),
+            "max_food": self.max_food,
+            "food": self.food,
+            "regen_rate": self.regen_rate,
+            "nutrition": self.nutrition
+        }
+
     def __str__(self):
         return f"""Bush(
             Pos X: {self.x},
