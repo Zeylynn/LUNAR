@@ -109,8 +109,12 @@ def run_neat(config_path):
 
     eval_func = partial(eval_genome, pickled_master_env=pickled_master_env)
 
-    # Use CPU count + 1 workers
-    #FIXME warum +1??
+    """
+    Use CPU count + 1 workers
+    => worker != Kern, ein Worker ist ein Prozess der eine Aufgabe ausführt.
+    Dieser Worker wird dann vom Scheduler Kernen zugeteilt.
+    + 1 damit während Idle Times der Scheduler sofort den nächsten Worker zuteilen kann
+    """
     num_workers = 1 + multiprocessing.cpu_count()
     logger.info(f"Starting ParallelEvaluator with {num_workers} workers")
     pe = neat.ParallelEvaluator(

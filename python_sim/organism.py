@@ -2,6 +2,7 @@ import math
 import random
 from resources import Bush
 
+#TODO NN Daten(net, genome) via JSON an Clemens schicken => für Visualisierung der "Brains"
 #TODO maybe Wasser / Food Threshold einbauen
 #TODO bei Life = 0 sterben sie, Life einbauen anstatt Energy
 #TODO die Organismen sollen sterben können, nicht nur im Training...
@@ -287,6 +288,22 @@ class Organism:
 
         # Metabolismus
         self.metabolism()
+
+    def to_dict(self):
+        """Return JSON-serializable dictionary of the organism"""
+        return {
+            "type": "Organism",
+            "x": int(self.x),
+            "y": int(self.y),
+            "angle": self.angle,
+            "energy": {"current": self.energy, "max": self.max_energy},
+            "water": {"current": self.water, "max": self.max_water},
+            "food": {"current": self.food, "max": self.max_food},
+            "speed": {"current": self.speed, "max": self.max_speed},
+            "turn_speed": {"current": self.turn_speed, "max": self.max_turn_speed},
+            "vision_range": self.vision_range,
+            "vision_fov": self.vision_fov,
+        }
 
     def __str__(self):
         return f"""Organism(

@@ -1,10 +1,14 @@
 from environment import Environment
+from server_handler import ServerHandler
+from json_builder import JSONBuilder
 import time
 import logger_setup as log
 import os
 import neat_runner as neat_run
-import neat
+import neat         #TODO das kann ich entfernen wenn ich die config in neat_runner auslagere
 
+#TODO brauchen wir eine Lizenz?
+#TODO Training läuft auf allen Kernen, Simulation nicht...
 #TODO RNNs für Memeory => wo war Wasser, wo war Food
 #TODO Such/Sortieralgorithmen mit bester Performance raussuchen => o(log(n))
 #NOTE ich hab eine Framerate von 20, GoDot muss das dann auf 60 FPS interpolieren, die Framerate irgendwie anzeigen
@@ -26,6 +30,14 @@ class Simulation:
 
         self.env = Environment(width=width, height=height, num_organisms=num_organisms, num_bushes=num_bushes, seed=seed)
         self.env.WorldGen.visualize()   #NOTE Remove Later
+
+        self.builder = JSONBuilder()
+        self.builder.build_terrain(self.env.terrain)
+
+        self.server = ServerHandler(host="127.0.0.1", port=9001)
+        self.server.create_socket()
+        self.server.wait_for_client()                           #NOTE potentieller delay
+        self.server.send_json(self.builder.json_terrain)        # Sendet das Terrain nur einmal, da es sich nie verändert
 
         logger.info("Simulation initialized")
 
@@ -67,7 +79,16 @@ class Simulation:
 
             # GANZE SIMULATION IN DIESEM CODEBEREICH
             self.run_tick()
+
+            # VERBINDUGN ZU GODOT
+            self.builder.build_bushes(self.env.bushes)
+            self.server.send_json(self.builder.json_bushes)
+
+            self.builder.build_organisms(self.env.organisms)
+            self.server.send_json(self.builder.json_organisms)
+            #TODO maybe Schlusszeichen senden damit GoDot weiß wann Schluss ist
             
+            # BERECHNUNG PERFORMANCE - FPS
             elapsed_time = time.time() - start_time
             sleep_time = max(0.0, TICK_DURATION - elapsed_time)
 
