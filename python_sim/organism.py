@@ -1,10 +1,9 @@
 import math
-import random
 from resources import Bush
 
-#TODO maybe Wasser / Food Threshold einbauen
-#TODO bei Life = 0 sterben sie, Life einbauen anstatt Energy
-#TODO die Organismen sollen sterben können, nicht nur im Training...
+#TODO maybe Wasser / Food Threshold einbauen als Variable/Mutation
+#FIXME bei Life = 0 sterben sie, Life einbauen anstatt Energy
+#FIXME die Organismen sollen sterben können, nicht nur im Training...
 #NOTE maybe isWater ist ein Attirbut was automatisch gesetzt wird?
 
 class Organism:
@@ -42,6 +41,8 @@ class Organism:
         # NEAT
         self.net = None
         self.genome = None
+        self.ate_this_tick = False        # Für Fitness Func
+        self.drank_this_tick = False      # Für Fitness Func
 
         # ATTRIBUTES - UNUSED
         self.life = 100
@@ -56,6 +57,8 @@ class Organism:
 
     def update(self, output):
         """Applied die NN Outputs"""
+        self.ate_this_tick = False
+        self.drank_this_tick = False
         self.apply_nn_output(output=output)
 
     def lerp(self, a, b, t):
@@ -130,7 +133,7 @@ class Organism:
                     # Wasser oder Food erkennen
                     if tile["terrain"] == 0:
                         visible_water.append((x, y))
-                    elif tile["object"] == "Bush":
+                    elif isinstance(tile["object"], Bush) == True:
                         visible_food.append((x, y))
                     #visible_tiles.append((x, y))               wäre zur Visualisierung von dem Sichtfeld
 
@@ -195,12 +198,15 @@ class Organism:
         #TODO kontinuierliches Trinken einbauen
         if self.is_on_water():
             self.water = min(self.max_water, self.water + 100)
+            self.drank_this_tick = True
 
     def eat(self, bush):
         """Organismus zieht 1 von bush.food ab und erhöht seine eigene Energie um bush.nutrition"""
         #TODO kontinuierliches Essen einbauen
-        harvested = bush.harvest()
-        self.energy = min(self.max_energy, self.energy + (harvested * bush.nutrition))
+        if bush.food >= 1.0:
+            harvested = bush.harvest()
+            self.energy = min(self.max_energy, self.energy + (harvested * bush.nutrition))
+            self.ate_this_tick = True
 
     def metabolism(self):
         """

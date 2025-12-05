@@ -109,7 +109,7 @@ class WorldGenerator:
             if self.terrain[y][x]["terrain"] == 0:
                 continue
 
-            #TODO implementieren dass ein gewisser Abstand zwischen den Büschen sein muss
+            #NOTE maybe implementieren dass ein gewisser Abstand zwischen den Büschen sein muss
 
             # Wenn frei → Busch platzieren
             self.terrain[y][x]["object"] = Bush(x, y)

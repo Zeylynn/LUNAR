@@ -3,8 +3,8 @@ import time
 import logger_setup as log
 import os
 import neat_runner as neat_run
-import neat
 
+#TODO muss ich die Organismen erkennen lassen wie viel Essen pro Bush ist?
 #TODO RNNs für Memeory => wo war Wasser, wo war Food
 #TODO Such/Sortieralgorithmen mit bester Performance raussuchen => o(log(n))
 #NOTE ich hab eine Framerate von 20, GoDot muss das dann auf 60 FPS interpolieren, die Framerate irgendwie anzeigen
@@ -90,16 +90,7 @@ if __name__ == "__main__":
     local_dir = os.path.dirname(__file__)
     config_path = os.path.join(local_dir, "config")
 
-    winner_genome = neat_run.run_neat(config_path=config_path)
+    winner_genome, winner_nn = neat_run.run_neat(config_path=config_path)
 
-    #FIXME das via Neat Runner machen
-    winner_nn = neat.nn.FeedForwardNetwork.create(winner_genome, neat.Config(
-        neat.DefaultGenome,
-        neat.DefaultReproduction,
-        neat.DefaultSpeciesSet,
-        neat.DefaultStagnation,
-        config_path
-    ))
-
-    sim = Simulation(nn=winner_nn)
+    sim = Simulation(width=30, height=30, num_bushes=200, nn=winner_nn)
     sim.run()
