@@ -5,9 +5,6 @@ import multiprocessing
 import pickle
 from functools import partial
 
-#FIXME Code verstehen, Quit Knopf einbauen
-#FIXME warum brauche ich jetzt noch pickle
-#FIXME was macht func_partial
 #TODO später JSON LOGS damit ich die Graphen zeichnen kann, pro Gen die Fitness Werte
 #TODO Multi Agent NEAT, mehrere Genomes in einem Environment
 #TODO maybe wegen Threaded Evaluation schauen, multiprocessing.shared_memory z.B.
@@ -75,7 +72,6 @@ def eval_genome(genome, config, pickled_master_env):
 
 def run_neat(config_path):
     NUM_GENS = 50       # max. Anzahl an Generationen, wenn nicht vorher via. fitness_threshold terminiert
-    global pickled_master_env
     logger.info("Starting NEAT run")
 
     config = neat.Config(
@@ -99,11 +95,10 @@ def run_neat(config_path):
     stats = neat.StatisticsReporter()
     population.add_reporter(stats)
 
-    # Einmal die Welt generieren und sie dann pop_size x num_gens kopieren
     #TODO jetzt ist immer dasselbe Environment für alle 100Gens, das sollt ned sein
     master_env = Environment(width=30, height=30, num_organisms=0, num_bushes=200, seed=None)
     logger.info("Master environment generated")
-    pickled_master_env = pickle.dumps(master_env)   # Speichert im RAM, dump speichert Dateien
+    pickled_master_env = pickle.dumps(master_env)   # Speichert im RAM, dazu da dass jeder Prozess eine Kopie anstatt einen Verweis bekommt
 
     eval_func = partial(eval_genome, pickled_master_env=pickled_master_env)
 
