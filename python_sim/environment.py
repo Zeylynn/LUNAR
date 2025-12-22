@@ -90,7 +90,7 @@ class Environment:
         - Angle to closest Water[-1...1]    =>  angle / pi
         - Amount of seen Water[0...1]       =>  seen_water / range
         """
-        #TODO Healthiness Später implementieren, config File Inputs anpassen           - Healthiness[0...1]        =>  health / max_health
+        #FIXME Healthiness Später implementieren, config File Inputs anpassen           - Healthiness[0...1]        =>  health / max_health
         #NOTE maybe besserer Name für Energiness
         #NOTE Amount seen vielleicht logarithmisch machen damit 30 oder 31 wasser egal ist idk
         seen = organism.seen_objects()
@@ -106,7 +106,7 @@ class Environment:
         # Nähestes Food suchen
         if seen["food"]:
             dist_food, angle_food = organism.get_closest(seen["food"])
-            dist_food_norm = dist_food / organism.range
+            dist_food_norm = dist_food / organism.vision_range
             angle_food_norm = angle_food / math.pi
             amount_food = min(len(seen["food"]) / organism.vision_area, 1.0)
         else:

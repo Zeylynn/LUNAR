@@ -5,12 +5,13 @@ import time
 import logger_setup as log
 import os
 import neat_runner as neat_run
-import neat         #TODO das kann ich entfernen wenn ich die config in neat_runner auslagere
 
+#TODO muss ich die Organismen erkennen lassen wie viel Essen pro Bush ist?
 #TODO brauchen wir eine Lizenz?
 #TODO Training läuft auf allen Kernen, Simulation nicht...
 #TODO RNNs für Memeory => wo war Wasser, wo war Food
 #TODO Such/Sortieralgorithmen mit bester Performance raussuchen => o(log(n))
+#TODO funktion für cleanes beenden einbauen
 #NOTE ich hab eine Framerate von 20, GoDot muss das dann auf 60 FPS interpolieren, die Framerate irgendwie anzeigen
 #NOTE maybe Genom für über Wasser gehen, binäres Genom
 #NOTE vielleicht eine Object Klasse als Basis für Organismen, Food mit .destroy() und Koordinaten usw.
@@ -93,12 +94,12 @@ class Simulation:
             sleep_time = max(0.0, TICK_DURATION - elapsed_time)
 
             actual_fps = 1.0 / elapsed_time
-            logger.debug(f"Tick {self.current_tick} finished | duration={elapsed_time:.4f}s | effective FPS={actual_fps:.2f}")
+            logger.debug(f"Tick {self.current_tick - 1} finished | duration={elapsed_time:.4f}s | effective FPS={actual_fps:.2f}")
 
             if sleep_time > 0.0:
                 time.sleep(sleep_time)      #NOTE time.sleep() nicht ganz optimal, im Rahmen dieses Projektes ausreichend
             else:
-                logger.warning(f"Tick {self.current_tick} took longer ({elapsed_time:.4f}s) than expected tick duration ({TICK_DURATION:.4f}s)")
+                logger.warning(f"Tick {self.current_tick - 1} took longer ({elapsed_time:.4f}s) than expected tick duration ({TICK_DURATION:.4f}s)")
 
         logger.info("Simulation finished")
 
@@ -111,16 +112,7 @@ if __name__ == "__main__":
     local_dir = os.path.dirname(__file__)
     config_path = os.path.join(local_dir, "config")
 
-    winner_genome = neat_run.run_neat(config_path=config_path)
+    winner_genome, winner_nn = neat_run.run_neat(config_path=config_path)
 
-    #FIXME das via Neat Runner machen
-    winner_nn = neat.nn.FeedForwardNetwork.create(winner_genome, neat.Config(
-        neat.DefaultGenome,
-        neat.DefaultReproduction,
-        neat.DefaultSpeciesSet,
-        neat.DefaultStagnation,
-        config_path
-    ))
-
-    sim = Simulation(nn=winner_nn)
+    sim = Simulation(width=30, height=30, num_bushes=200, nn=winner_nn)
     sim.run()

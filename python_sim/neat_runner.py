@@ -5,9 +5,6 @@ import multiprocessing
 import pickle
 from functools import partial
 
-#FIXME Code verstehen, Quit Knopf einbauen
-#FIXME warum brauche ich jetzt noch pickle
-#FIXME was macht func_partial
 #TODO später JSON LOGS damit ich die Graphen zeichnen kann, pro Gen die Fitness Werte
 #TODO Multi Agent NEAT, mehrere Genomes in einem Environment
 #TODO maybe wegen Threaded Evaluation schauen, multiprocessing.shared_memory z.B.
@@ -55,13 +52,11 @@ def eval_genome(genome, config, pickled_master_env):
         fitness += org.food / org.max_food
         fitness += org.water / org.max_water
 
-        #FIXME 3. Essen/Trinken belohnen
-        """
-        if organism.ate_this_tick:
-            fitness += 1.0
-        if organism.drank_this_tick:
-            fitness += 1.0
-        """
+        #3. Essen/Trinken belohnen
+        if org.ate_this_tick:
+            fitness += 4.0
+        if org.drank_this_tick:
+            fitness += 2.0
 
         # 4. Ressourcen in Sicht belohnen
         seen = org.seen_objects()
@@ -77,7 +72,6 @@ def eval_genome(genome, config, pickled_master_env):
 
 def run_neat(config_path):
     NUM_GENS = 50       # max. Anzahl an Generationen, wenn nicht vorher via. fitness_threshold terminiert
-    global pickled_master_env
     logger.info("Starting NEAT run")
 
     config = neat.Config(
@@ -101,11 +95,10 @@ def run_neat(config_path):
     stats = neat.StatisticsReporter()
     population.add_reporter(stats)
 
-    # Einmal die Welt generieren und sie dann pop_size x num_gens kopieren
-    #FIXME jetzt ist immer dasselbe Environment für alle 100Gens, das sollt ned sein
-    master_env = Environment(width=100, height=100, num_organisms=0, num_bushes=200, seed=None)
+    #TODO jetzt ist immer dasselbe Environment für alle 100Gens, das sollt ned sein
+    master_env = Environment(width=30, height=30, num_organisms=0, num_bushes=200, seed=None)
     logger.info("Master environment generated")
-    pickled_master_env = pickle.dumps(master_env)   # Speichert im RAM, dump speichert Dateien
+    pickled_master_env = pickle.dumps(master_env)   # Speichert im RAM, dazu da dass jeder Prozess eine Kopie anstatt einen Verweis bekommt
 
     eval_func = partial(eval_genome, pickled_master_env=pickled_master_env)
 
@@ -124,6 +117,7 @@ def run_neat(config_path):
 
     logger.info(f"Starting evolution loop (max {NUM_GENS} generations).")
     winner = population.run(pe.evaluate, n=NUM_GENS)
+    winner_nn = neat.nn.FeedForwardNetwork.create(winner, config)
 
     logger.info(f"NEAT evolution completed. Winner genome ID: {winner}")
     logger.info(f"Winner Fitness: {winner.fitness:.4f}")
@@ -143,4 +137,4 @@ def run_neat(config_path):
     logger.info(f"Saved winner genome to {out_path}")
     """
 
-    return winner
+    return winner, winner_nn
