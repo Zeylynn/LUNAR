@@ -3,7 +3,6 @@ import time
 import logger_setup as log
 import os
 import neat_runner as neat_run
-import msvcrt
 
 #TODO muss ich die Organismen erkennen lassen wie viel Essen pro Bush ist?
 #TODO RNNs für Memeory => wo war Wasser, wo war Food
