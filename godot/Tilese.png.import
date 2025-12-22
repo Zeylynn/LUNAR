@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dxxmoim3skexx"
-path="res://.godot/imported/AE3.png-a777d4326869c5abf6a1aaaec77014de.ctex"
+uid="uid://3lyrkunx6gbt"
+path="res://.godot/imported/Tilese.png-0af2cf96ef57d80ca2768fcc2e70d531.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://skripte/AE3.png"
-dest_files=["res://.godot/imported/AE3.png-a777d4326869c5abf6a1aaaec77014de.ctex"]
+source_file="res://Tilese.png"
+dest_files=["res://.godot/imported/Tilese.png-0af2cf96ef57d80ca2768fcc2e70d531.ctex"]
 
 [params]
 

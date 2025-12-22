@@ -10,16 +10,7 @@ config_version=5
 
 [application]
 
-config/name="ersterMeilenstein"
-run/main_scene="uid://k0u2g0g76btd"
+config/name="dritterSteilenMein"
+run/main_scene="uid://cc6ek61e0mrcp"
 config/features=PackedStringArray("4.5", "Forward Plus")
 config/icon="res://icon.svg"
-
-[display]
-
-window/size/viewport_width=1160
-window/size/viewport_height=640
-
-[rendering]
-
-textures/canvas_textures/default_texture_filter=0

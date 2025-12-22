@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://blvyr1p3oodna"
-path="res://.godot/imported/TemplateNEU.png-91c080453e1df69f8ac8cc284fcfa3c6.ctex"
+uid="uid://h6s1qukcnrct"
+path="res://.godot/imported/Tilesetbessa.png-445123a67e2f43ec2c49725a0c7cbdd2.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://skripte/TemplateNEU.png"
-dest_files=["res://.godot/imported/TemplateNEU.png-91c080453e1df69f8ac8cc284fcfa3c6.ctex"]
+source_file="res://Tilesetbessa.png"
+dest_files=["res://.godot/imported/Tilesetbessa.png-445123a67e2f43ec2c49725a0c7cbdd2.ctex"]
 
 [params]
 

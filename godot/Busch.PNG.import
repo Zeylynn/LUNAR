@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://g0tfllfi34qq"
-path="res://.godot/imported/Template222222.png-00eaef344d58ade2ab9174560894c3a9.ctex"
+uid="uid://bqy626ya7ssri"
+path="res://.godot/imported/Busch.PNG-deb67f3c4bfc5d2ca14993bf55713f8b.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://skripte/Template222222.png"
-dest_files=["res://.godot/imported/Template222222.png-00eaef344d58ade2ab9174560894c3a9.ctex"]
+source_file="res://Busch.PNG"
+dest_files=["res://.godot/imported/Busch.PNG-deb67f3c4bfc5d2ca14993bf55713f8b.ctex"]
 
 [params]
 
