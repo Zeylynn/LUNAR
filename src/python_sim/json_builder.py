@@ -1,6 +1,5 @@
-from resources import Bush
+from python_sim.resources import Bush
 import json
-import copy
 
 #TODO maybe logger einbauen
 
@@ -55,16 +54,3 @@ class JSONBuilder:
         }
 
         self.json_terrain = json.dumps(result)
-
-if __name__ == "__main__":
-    from world_generator import WorldGenerator
-
-    world = WorldGenerator(10, 10, seed=999, num_bushes=10)
-    world.init_world()
-    terrain = world.get_terrain()
-
-    print(terrain)
-    builder = JSONBuilder()
-    builder.build_terrain(terrain=terrain)
-
-    print(builder.json_terrain)

@@ -3,7 +3,7 @@ cycler==0.12.1
 fonttools==4.60.1
 kiwisolver==1.4.9
 matplotlib==3.10.7
-neat-python==0.93
+neat-python==0.92
 noise==1.2.2
 numpy==2.3.4
 packaging==25.0

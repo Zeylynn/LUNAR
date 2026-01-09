@@ -1,9 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from noise import pnoise2
-import logger_setup as log
+import python_sim.logger_setup as log
 import random
-from resources import Bush
+from python_sim.resources import Bush
 
 logger = log.get_logger(__name__)
 

@@ -1,5 +1,5 @@
 import math
-from resources import Bush
+from python_sim.resources import Bush
 
 #TODO NN Daten(net, genome) via JSON an Clemens schicken => für Visualisierung der "Brains"
 #TODO maybe Wasser / Food Threshold einbauen als Variable/Mutation

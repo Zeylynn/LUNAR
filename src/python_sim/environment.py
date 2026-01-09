@@ -1,8 +1,8 @@
-from organism import Organism
-from world_generator import WorldGenerator
+from python_sim.organism import Organism
+from python_sim.world_generator import WorldGenerator
 import random
 import math
-import logger_setup as log
+import python_sim.logger_setup as log
 import copy
 
 logger = log.get_logger(__name__)

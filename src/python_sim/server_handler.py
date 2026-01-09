@@ -1,5 +1,5 @@
 import socket
-import logger_setup as log
+import python_sim.logger_setup as log
 
 #NOTE für max. throughput normale Sockets besser, allerdings benutzen die Byte-Streams, kein JSON
 #NOTE das File nicht Socket nennen, weil es sonst gleich heißt wie das Python-Modul => Fehler

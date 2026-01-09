@@ -1,10 +1,10 @@
-from environment import Environment
-from server_handler import ServerHandler
-from json_builder import JSONBuilder
+from python_sim.environment import Environment
+from python_sim.server_handler import ServerHandler
+from python_sim.json_builder import JSONBuilder
 import time
-import logger_setup as log
+import python_sim.logger_setup as log
 import os
-import neat_runner as neat_run
+import python_sim.neat_runner as neat_run
 
 #TODO muss ich die Organismen erkennen lassen wie viel Essen pro Bush ist?
 #TODO brauchen wir eine Lizenz?

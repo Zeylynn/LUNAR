@@ -1,6 +1,6 @@
 import neat
-from environment import Environment
-import logger_setup as log
+from python_sim.environment import Environment
+import python_sim.logger_setup as log
 import multiprocessing
 import pickle
 from functools import partial
