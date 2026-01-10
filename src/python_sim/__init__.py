@@ -38,4 +38,6 @@ Mit einer src/-Struktur liegt dein Paketcode in einem Unterordner (src/python_si
 getrennt vom Projekt-Root. Dadurch verhindern Editable-Installs, 
 dass Python versehentlich alte oder lokale Dateien im Root importiert, 
 und garantieren, dass Tests, Skripte und IDEs immer die „richtige“ Package-Version aus dem installierten Pfad sehen
+
+mit git mv ALT-FOLDER NEU-FOLDER Files verschieben + umbennen damit Git das checkt
 """

@@ -13,11 +13,10 @@ from functools import partial
 
 logger = log.get_logger(__name__)
 
-def eval_genome(genome, config, pickled_master_env):
+def eval_genome(genome, config, sim_ticks, pickled_master_env):
     """
     Bewertet ein einzelnes Genom in einer eigenen Kopie des Master-Environments.
     """
-    SIM_TICKS = 500
     env = pickle.loads(pickled_master_env)      # Lädt vom RAM
 
     net = neat.nn.FeedForwardNetwork.create(genome, config)             #TODO Später maybe ein RNN statt FFW für Memory
@@ -33,7 +32,7 @@ def eval_genome(genome, config, pickled_master_env):
     Für jedes Genom/NN wird eine mini-Simulation simuliert um die Fitness UNABHÄNGIG von den anderen Organismen zu ermitteln
     NEAT erstelle dann anhand der Basis von den Fitness Werten neue Generationen
     """
-    for _ in range(SIM_TICKS):
+    for _ in range(sim_ticks):
         inputs = env.get_inputs(org)
         outputs = net.activate(inputs)
         org.update(outputs)
@@ -70,25 +69,25 @@ def eval_genome(genome, config, pickled_master_env):
     genome.fitness = fitness    # Die eigentliche Fitness
     return fitness              # Optional, setzt interne ParallelEvaluator Werte
 
-def run_neat(config_path):
-    NUM_GENS = 50       # max. Anzahl an Generationen, wenn nicht vorher via. fitness_threshold terminiert
+def run_neat(neat_config_path, app_config):
+    NUM_GENS = app_config["neat"]["num_gens"]       # max. Anzahl an Generationen, wenn nicht vorher via. fitness_threshold terminiert
     logger.info("Starting NEAT run")
 
-    config = neat.Config(
+    neat_config = neat.Config(
         neat.DefaultGenome,
         neat.DefaultReproduction,
         neat.DefaultSpeciesSet,
         neat.DefaultStagnation,
-        config_path
+        neat_config_path
     )
 
     logger.info(
-        f"NEAT Config loaded: pop_size={config.pop_size}, "
-        f"inputs={config.genome_config.num_inputs}, "
-        f"outputs={config.genome_config.num_outputs}"
+        f"NEAT Config loaded: pop_size={neat_config.pop_size}, "
+        f"inputs={neat_config.genome_config.num_inputs}, "
+        f"outputs={neat_config.genome_config.num_outputs}"
     )
 
-    population = neat.Population(config)
+    population = neat.Population(neat_config)
 
     # Gibt Konsolenoutput um Fortschritt zu sehen
     population.add_reporter(neat.StdOutReporter(True))
@@ -96,11 +95,16 @@ def run_neat(config_path):
     population.add_reporter(stats)
 
     #TODO jetzt ist immer dasselbe Environment für alle 100Gens, das sollt ned sein
-    master_env = Environment(width=30, height=30, num_organisms=0, num_bushes=200, seed=None)
+    master_config = app_config["master_env"]
+    master_env = Environment(width=master_config["width"],
+                             height=master_config["height"],
+                             num_organisms=0,
+                             num_bushes=master_config["num_bushes"],
+                             seed=master_config["seed"])
     logger.info("Master environment generated")
     pickled_master_env = pickle.dumps(master_env)   # Speichert im RAM, dazu da dass jeder Prozess eine Kopie anstatt einen Verweis bekommt
 
-    eval_func = partial(eval_genome, pickled_master_env=pickled_master_env)
+    eval_func = partial(eval_genome, sim_ticks=app_config["neat"]["sim_ticks"], pickled_master_env=pickled_master_env)
 
     """
     Use CPU count + 1 workers
@@ -117,7 +121,7 @@ def run_neat(config_path):
 
     logger.info(f"Starting evolution loop (max {NUM_GENS} generations).")
     winner = population.run(pe.evaluate, n=NUM_GENS)
-    winner_nn = neat.nn.FeedForwardNetwork.create(winner, config)
+    winner_nn = neat.nn.FeedForwardNetwork.create(winner, neat_config)
 
     logger.info(f"NEAT evolution completed. Winner genome ID: {winner}")
     logger.info(f"Winner Fitness: {winner.fitness:.4f}")

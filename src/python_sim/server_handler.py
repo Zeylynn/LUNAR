@@ -7,13 +7,13 @@ import python_sim.logger_setup as log
 logger = log.get_logger(__name__)
 
 class ServerHandler:
-    def __init__(self, host="127.0.0.1", port=9001):
+    def __init__(self, config):
         """
         host: IP-Adresse (localhost)
         port: 9001 = freier Port vom OS
         """
-        self.host = host
-        self.port = port
+        self.host = config["host"]
+        self.port = config["port"]
         self.server_socket = None
         self.client_socket = None
         self.client_addr = None

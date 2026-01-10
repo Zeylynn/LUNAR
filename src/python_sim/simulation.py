@@ -3,8 +3,6 @@ from python_sim.server_handler import ServerHandler
 from python_sim.json_builder import JSONBuilder
 import time
 import python_sim.logger_setup as log
-import os
-import python_sim.neat_runner as neat_run
 
 #TODO muss ich die Organismen erkennen lassen wie viel Essen pro Bush ist?
 #TODO brauchen wir eine Lizenz?
@@ -18,24 +16,29 @@ import python_sim.neat_runner as neat_run
 #NOTE überlegen ob ich alle Attribute private oder so machen soll
 #NOTE wie trainiere ich das Programm dann am KI-Server
 
-TICK_RATE = 20                      # FPS
-TICK_DURATION = 1 / TICK_RATE
-
 logger = log.get_logger(__name__)
 
 class Simulation:
-    def __init__(self, width=100, height=100, num_organisms=50, num_bushes=100, max_ticks=100, seed=None, nn=None):
-        self.max_ticks = max_ticks
-        self.current_tick = 0
-        self.nn = nn                    #NOTE Optional, später dann für Fertigtrainierte Modelle zum übergeben
+    def __init__(self, config, nn=None):
+        sim_config = config["simulation"]
+        self.tick_rate = sim_config["tick_rate"]        # FPS
+        self.tick_duration = 1 / self.tick_rate
+        self.max_ticks = sim_config["max_ticks"]
 
-        self.env = Environment(width=width, height=height, num_organisms=num_organisms, num_bushes=num_bushes, seed=seed)
+        self.env = Environment(width=sim_config["width"],
+                               height=sim_config["height"],
+                               num_organisms=sim_config["num_organisms"],
+                               num_bushes=sim_config["num_bushes"],
+                               seed=sim_config["seed"])
         self.env.WorldGen.visualize()   #NOTE Remove Later
+
+        self.nn = nn
+        self.current_tick = 0
 
         self.builder = JSONBuilder()
         self.builder.build_terrain(self.env.terrain)
 
-        self.server = ServerHandler(host="127.0.0.1", port=9001)
+        self.server = ServerHandler(config["server"])
         self.server.create_socket()
         self.server.wait_for_client()                           #NOTE potentieller delay
         self.server.send_json(self.builder.json_terrain)        # Sendet das Terrain nur einmal, da es sich nie verändert
@@ -62,7 +65,7 @@ class Simulation:
             #logger.debug(bush)
             print(bush)
 
-        #NOTE Wenn trainiertes NN übergeben wurde, anwenden. Ist zwar ein NN für alle Organismen aber darüber muss ich mir später Gedanken machen
+        #NOTE Ist zwar ein NN für alle Organismen aber darüber muss ich mir später Gedanken machen
         if self.nn:
             for org in self.env.organisms:
                 inputs = self.env.get_inputs(org)
@@ -91,7 +94,7 @@ class Simulation:
             
             # BERECHNUNG PERFORMANCE - FPS
             elapsed_time = time.time() - start_time
-            sleep_time = max(0.0, TICK_DURATION - elapsed_time)
+            sleep_time = max(0.0, self.tick_duration - elapsed_time)
 
             actual_fps = 1.0 / elapsed_time
             logger.debug(f"Tick {self.current_tick - 1} finished | duration={elapsed_time:.4f}s | effective FPS={actual_fps:.2f}")
@@ -99,20 +102,6 @@ class Simulation:
             if sleep_time > 0.0:
                 time.sleep(sleep_time)      #NOTE time.sleep() nicht ganz optimal, im Rahmen dieses Projektes ausreichend
             else:
-                logger.warning(f"Tick {self.current_tick - 1} took longer ({elapsed_time:.4f}s) than expected tick duration ({TICK_DURATION:.4f}s)")
+                logger.warning(f"Tick {self.current_tick - 1} took longer ({elapsed_time:.4f}s) than expected tick duration ({self.tick_duration:.4f}s)")
 
         logger.info("Simulation finished")
-
-"""
-wird benötigt weil Windows neue Prozesse/Multiprocessing via Spawn erstellt.
-Spawn importiert beim ERSTELLEN des neuen Prozesses alle Module und führt danach das Hauptskript aus.
-d.h. dass alles ohne if __name__ == "__main__" doppelt ausgeführt wird. Dadurch wird der pool von Parallel Evaluator fehlerhaft gesetzt => Error
-"""
-if __name__ == "__main__":
-    local_dir = os.path.dirname(__file__)
-    config_path = os.path.join(local_dir, "config")
-
-    winner_genome, winner_nn = neat_run.run_neat(config_path=config_path)
-
-    sim = Simulation(width=30, height=30, num_bushes=200, nn=winner_nn)
-    sim.run()
