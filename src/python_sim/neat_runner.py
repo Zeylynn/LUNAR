@@ -132,13 +132,4 @@ def run_neat(neat_config_path, app_config):
         fit = getattr(g, "fitness", None)
         logger.info(f"Gen {gen_idx}: best_fitness={fit}")
 
-    # Save winner genome to file for later reuse
-    """
-    #FIXME das beste NN speichern => pickle, das winner obj speichern und dann das NN für die Outputs usen, VERIFIEN
-    out_path = "winner_genome.pkl"
-    with open(out_path, "wb") as f:
-        pickle.dump(winner, f)
-    logger.info(f"Saved winner genome to {out_path}")
-    """
-
     return winner, winner_nn

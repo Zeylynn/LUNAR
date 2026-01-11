@@ -1,31 +1,24 @@
 import os
 import python_sim.neat_runner as neat_run
+import python_sim.simulation as sim
 from python_sim.config_loader import load_config
-import pickle
-import python_sim.logger_setup as log
 
-logger = log.get_logger(__name__)
+#TODO eigene TODO liste mit Folder oder so
+#TODO die World Gen Parameter in die config packen
+#TODO die Organism/Bush Max Werte in die config packen
+
 app_config = load_config()
 
-# Speichert das genom mit pickle(als Bit String) ab, laden und NN daraus erzeugen um das NN wiederherzustellen
-#TODO das via JSON Export oder in NN mit Numpy umwandeln
-#TODO da Versionierung reinpacken
-def train():
+def main():
     neat_conf_file = "../config/neat-config"
     base_dir = os.path.dirname(os.path.abspath(__file__))
     neat_conf_file = os.path.join(base_dir, neat_conf_file)
 
     winner_genome, winner_nn = neat_run.run_neat(neat_config_path=neat_conf_file,
-                                                    app_config=app_config)
-    
-    genome_dir = "../genomes"
-    genome_dir = os.path.join(base_dir, genome_dir)
-    os.makedirs(genome_dir, exist_ok=True)
-    genome_file = os.path.join(genome_dir, "genome.pkl")
+                                                 app_config=app_config)
 
-    with open(genome_file, "wb") as f:
-        pickle.dump(winner_genome, f)
-        logger.info(f"Saved winner genome to {genome_file}")
+    app = sim.Simulation(config=app_config, nn=winner_nn)
+    app.run()
 
 """
 wird benötigt weil Windows neue Prozesse/Multiprocessing via Spawn erstellt.
@@ -33,4 +26,4 @@ Spawn importiert beim ERSTELLEN des neuen Prozesses alle Module und führt danac
 d.h. dass alles ohne if __name__ == "__main__" doppelt ausgeführt wird. Dadurch wird der pool von Parallel Evaluator fehlerhaft gesetzt => Error
 """
 if __name__ == "__main__":
-    train()
+    main()
