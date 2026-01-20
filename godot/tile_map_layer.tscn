@@ -1,12 +1,10 @@
-[gd_scene load_steps=6 format=3 uid="uid://cc6ek61e0mrcp"]
+[gd_scene load_steps=4 format=3 uid="uid://cfx3c45p7d807"]
 
-[ext_resource type="Texture2D" uid="uid://h6s1qukcnrct" path="res://Tilesetbessa.png" id="1_f3sb7"]
-[ext_resource type="PackedScene" uid="uid://cfx3c45p7d807" path="res://tile_map_layer.tscn" id="1_fj7yv"]
-[ext_resource type="Script" uid="uid://5jbpgymsne5k" path="res://test.gd" id="1_tlwt5"]
+[ext_resource type="Texture2D" uid="uid://h6s1qukcnrct" path="res://Tilesetbessa.png" id="1_0ugm7"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_f3sb7"]
-texture = ExtResource("1_f3sb7")
-texture_region_size = Vector2i(200, 200)
+texture = ExtResource("1_0ugm7")
+texture_region_size = Vector2i(32, 32)
 1:0/0 = 0
 1:0/0/terrain_set = 0
 1:0/0/terrain = 1
@@ -76,7 +74,7 @@ texture_region_size = Vector2i(200, 200)
 11:0/0/terrain_set = 0
 
 [sub_resource type="TileSet" id="TileSet_fj7yv"]
-tile_size = Vector2i(200, 200)
+tile_size = Vector2i(32, 32)
 terrain_set_0/mode = 0
 terrain_set_0/terrain_0/name = "Wasser"
 terrain_set_0/terrain_0/color = Color(0.5, 0.34375, 0.25, 1)
@@ -84,14 +82,5 @@ terrain_set_0/terrain_1/name = "Land"
 terrain_set_0/terrain_1/color = Color(0.5, 0.4375, 0.25, 1)
 sources/0 = SubResource("TileSetAtlasSource_f3sb7")
 
-[node name="World" type="Node2D"]
-script = ExtResource("1_tlwt5")
-
-[node name="TileMapLayer" parent="." instance=ExtResource("1_fj7yv")]
-tile_map_data = PackedByteArray()
-
-[node name="TileMapLayer2" type="TileMapLayer" parent="."]
-visible = false
+[node name="TileMapLayer" type="TileMapLayer"]
 tile_set = SubResource("TileSet_fj7yv")
-
-[node name="Camera2D" type="Camera2D" parent="."]
