@@ -5,7 +5,6 @@ import time
 import python_sim.logger_setup as log
 
 #TODO muss ich die Organismen erkennen lassen wie viel Essen pro Bush ist?
-#TODO brauchen wir eine Lizenz?
 #TODO Training läuft auf allen Kernen, Simulation nicht...
 #TODO RNNs für Memeory => wo war Wasser, wo war Food
 #TODO Such/Sortieralgorithmen mit bester Performance raussuchen => o(log(n))
@@ -20,6 +19,10 @@ logger = log.get_logger(__name__)
 
 class Simulation:
     def __init__(self, config, nn=None):
+        # Flags für Simsteuerung
+        self.paused = False
+        self.running = True
+
         sim_config = config["simulation"]
         self.tick_rate = sim_config["tick_rate"]        # FPS
         self.tick_duration = 1 / self.tick_rate
@@ -40,12 +43,10 @@ class Simulation:
 
         self.server = ServerHandler(config["server"])
         self.server.create_socket()
-        self.server.wait_for_client()                           #NOTE potentieller delay
-        self.server.send_json(self.builder.json_terrain)        # Sendet das Terrain nur einmal, da es sich nie verändert
 
         logger.info("Simulation initialized")
 
-    def run_tick(self):
+    async def run_tick(self):
         """
         Führt 1en Tick aus, beinhaltet
         - env.update()
@@ -74,8 +75,11 @@ class Simulation:
 
         self.current_tick += 1
 
-    def run(self):
+    async def run(self):
         """Lässt {self.max_ticks} viele Ticks laufen mit fixer Tickrate"""
+        await self.server.wait_for_client()                           #NOTE potentieller delay
+        await self.server.send_json(self.builder.json_terrain)        # Sendet das Terrain nur einmal, da es sich nie verändert
+
         logger.info(f"Simulation started | Max ticks: {self.max_ticks}")
 
         while self.current_tick < self.max_ticks:
@@ -86,10 +90,14 @@ class Simulation:
 
             # VERBINDUGN ZU GODOT
             self.builder.build_bushes(self.env.bushes)
-            self.server.send_json(self.builder.json_bushes)
-
             self.builder.build_organisms(self.env.organisms)
-            self.server.send_json(self.builder.json_organisms)
+            self.builder.build_state(self.current_tick, self.tick_rate)
+
+            await self.server.send_json(self.builder.json_state)
+            #FIXME UI Commands MÜSSEN High Priority sein
+            command = await self.server.recv_json()
+            self.process_commands(command)
+
             #TODO maybe Schlusszeichen senden damit GoDot weiß wann Schluss ist
             
             # BERECHNUNG PERFORMANCE - FPS
@@ -105,3 +113,16 @@ class Simulation:
                 logger.warning(f"Tick {self.current_tick - 1} took longer ({elapsed_time:.4f}s) than expected tick duration ({self.tick_duration:.4f}s)")
 
         logger.info("Simulation finished")
+
+    def process_commands(self, cmd):
+        """
+        Liest eingehende JSON-Commands non-blocking vom Client und setzt Flags.
+        Erwartet Commands:
+        - {"cmd":"pause"},
+        - {"cmd":"resume"},
+        - {"cmd":"set_speed", "tick_rate":40},
+        - {"cmd":"quit"}.
+        - {"cmd":"select_entity"}
+        """
+        #FIXME implementieren
+        pass

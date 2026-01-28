@@ -1,5 +1,11 @@
+import itertools
+
 class Bush:
+    _id_counter = itertools.count(start=1)
+
     def __init__(self, x, y, max_food=3, regen_rate=0.05):
+        self.id = next(Bush._id_counter)
+
         # float damit man u.a. mit Organismus Koordinaten vergleichen kann
         self.x = float(x)
         self.y = float(y)
@@ -32,7 +38,7 @@ class Bush:
     def to_dict(self):
         """Return JSON-serializable dictionary of the bush"""
         return {
-            "type": "Bush",
+            "id": self.id,
             "x": int(self.x),
             "y": int(self.y),
             "max_food": self.max_food,

@@ -114,7 +114,7 @@ def run_neat(neat_config_path, app_config):
     """
     num_workers = 1 + multiprocessing.cpu_count()
     logger.info(f"Starting ParallelEvaluator with {num_workers} workers")
-    pe = neat.ParallelEvaluator(
+    pe = neat.ParallelEvaluator(    # Wenn ich das manuell machen will dann ProcessPoolExecutor
         num_workers=num_workers,
         eval_function=eval_func
     )

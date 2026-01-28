@@ -1,5 +1,6 @@
 import math
 from python_sim.resources import Bush
+import itertools
 
 #TODO NN Daten(net, genome) via JSON an Clemens schicken => für Visualisierung der "Brains"
 #TODO maybe Wasser / Food Threshold einbauen als Variable/Mutation
@@ -8,10 +9,16 @@ from python_sim.resources import Bush
 #NOTE maybe isWater ist ein Attirbut was automatisch gesetzt wird?
 
 class Organism:
+    # Threadsafe d.h. wenn Instanzen in mehreren Threads erstellt werden bekommen sie trotzdem einzigartige IDs, bei Prozessen nicht
+    _id_counter = itertools.count(start=1)
+
     def __init__(self, x, y, angle, max_speed, max_turn_speed, vision_level, terrain):
+        self.id = next(Organism._id_counter)
         # Position
         self.x = x
         self.y = y
+        self.prev_x = self.x
+        self.prev_y = self.y
 
         # Stats
         self.max_energy = 100
@@ -238,8 +245,8 @@ class Organism:
         """
         turn + throttle werden angewandt
         """
-        old_x = self.x
-        old_y = self.y
+        self.prev_x = self.x
+        self.prev_y = self.y
         height = len(self.terrain)
         width = len(self.terrain[0])
 
@@ -252,7 +259,7 @@ class Organism:
         self.y = max(0, min(self.y, height - 1e-6))
 
         # Getravelte Distanz berechnen
-        distance = math.hypot(self.x - old_x, self.y - old_y)
+        distance = math.hypot(self.x - self.prev_x, self.y - self.prev_y)
 
         # Energieverlust proportional zur tatsächlichen Distanz
         self.energy -= distance * 0.5
@@ -298,17 +305,19 @@ class Organism:
     def to_dict(self):
         """Return JSON-serializable dictionary of the organism"""
         return {
-            "type": "Organism",
-            "x": int(self.x),
-            "y": int(self.y),
-            "angle": self.angle,
-            "energy": {"current": self.energy, "max": self.max_energy},
-            "water": {"current": self.water, "max": self.max_water},
-            "food": {"current": self.food, "max": self.max_food},
-            "speed": {"current": self.speed, "max": self.max_speed},
-            "turn_speed": {"current": self.turn_speed, "max": self.max_turn_speed},
-            "vision_range": self.vision_range,
-            "vision_fov": self.vision_fov,
+            "id": self.id,
+            "x": round(self.x, 2),
+            "y": round(self.y, 2),
+            "prev_x": round(self.prev_x, 2),
+            "prev_y": round(self.prev_y, 2),
+            "angle": round(self.angle, 2),
+            "energy": {"current": round(self.energy, 2), "max": self.max_energy},
+            "water": {"current": round(self.water, 2), "max": self.max_water},
+            "food": {"current": round(self.food, 2), "max": self.max_food},
+            "speed": {"current": round(self.speed, 2), "max": self.max_speed},
+            "turn_speed": {"current": round(self.turn_speed, 2), "max": self.max_turn_speed},
+            "vision_range": round(self.vision_range, 2),
+            "vision_fov": round(self.vision_fov, 2),
         }
 
     def __str__(self):

@@ -1,10 +1,12 @@
 from python_sim.resources import Bush
 import json
 
+#TODO Falls unperformant maybe msgpack
 #TODO maybe logger einbauen
 
 class JSONBuilder:
     def __init__(self):
+        self.json_state = None
         self.json_terrain = None
         self.json_organisms = None
         self.json_bushes = None
@@ -27,6 +29,21 @@ class JSONBuilder:
         #NOTE wenn man mehr als 1 Objekt sendet muss man vielleicht mit kompatibilität schauen, z.B. \n am Ende anfügen fpr Trennung
         self.json_bushes = json.dumps(result)
 
+    def build_state(self, tick, tick_rate):
+        result = {
+            "type": "state",
+            "entities": {
+                "organisms": self.json_organisms,
+                "bushes": self.json_bushes
+            },
+            "metadata": {
+                "tick": tick,
+                "tick_rate": tick_rate
+            }
+        }
+
+        self.json_state = json.dumps(result)
+
     def build_terrain(self, terrain):
         """Exportiert terrain in Godot-freundliches JSON"""
         height = len(terrain)
@@ -48,6 +65,7 @@ class JSONBuilder:
             terrain_out.append(terrain_row)
 
         result = {
+            "type": "terrain",
             "size": {"width": width, "height": height},
             "terrain": terrain_out,
             "objects": objects

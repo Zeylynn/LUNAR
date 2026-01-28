@@ -1,6 +1,8 @@
 import socket
 import python_sim.logger_setup as log
+import asyncio
 
+#TODO das in normal asyncio usmchreiben, ohne Workaround
 #NOTE für max. throughput normale Sockets besser, allerdings benutzen die Byte-Streams, kein JSON
 #NOTE das File nicht Socket nennen, weil es sonst gleich heißt wie das Python-Modul => Fehler
 
@@ -25,21 +27,35 @@ class ServerHandler:
             socket.SOCK_STREAM)         # TCP-Socket
         self.server_socket.bind((self.host, self.port))
         self.server_socket.listen(1)    # max. 1 Client
+        self.server_socket.setblocking(False)
 
         logger.info(f"Server listening on {self.host}:{self.port}")
         print(f"Server listening on {self.host}:{self.port}")
 
-    def wait_for_client(self):
+    async def wait_for_client(self):
         """Warte auf Client-Verbindung"""
-        print("Waiting for client...")
-        self.client_socket, self.client_addr = self.server_socket.accept()
+        loop = asyncio.get_running_loop()
+        print("Waiting for client...")             # Workaround, weil .accept() blocking ist
+        self.client_socket, self.client_addr = await loop.sock_accept(self.server_socket.accept())
+        self.client_socket.setblocking(False)
 
         logger.info(f"Client connected: {self.client_addr}")
         print(f"Client connected: {self.client_addr}")
 
-    def send_json(self, data):
+    async def send_json(self, data):
         """Sendet ein JSON-Objekt an den Client"""
-        self.client_socket.sendall(data.encode("utf-8"))
+        loop = asyncio.get_running_loop()
+        await loop.sock_sendall(self.client_socket, data.encode("utf-8"))
+
+    async def recv_json(self, buffer_size=1024):
+        """Empfängt ein JSON-Objekt vom Client"""
+        loop = asyncio.get_running_loop()
+        try:
+            data = await loop.sock_recv(self.client_socket, (buffer_size))    # 1024 Bytes maximalgröße pro Nachricht
+            return data.decode("utf-8")
+        except:
+            logger.error(f"Fehler beim Empfangen vom Client")
+            return None
 
     def close(self):
         """Schließt Socket(s)"""

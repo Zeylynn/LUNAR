@@ -40,4 +40,18 @@ dass Python versehentlich alte oder lokale Dateien im Root importiert,
 und garantieren, dass Tests, Skripte und IDEs immer die „richtige“ Package-Version aus dem installierten Pfad sehen
 
 mit git mv ALT-FOLDER NEU-FOLDER Files verschieben + umbennen damit Git das checkt
+
+-- LICENSE --
+
+Text der DA / Code im Repo unterliegen anderen Lizenzen/Copyrights
+
+Patent = schützt eine NEUE (technische) Idee, staatlich verliehen
+Patentschutz = regelt, ob jemand eine patentierbare Idee verklagen darf, wenn er den Code benutzt.
+Copyright = schützt konkreten Code, regelt kopieren, ändern, weitergeben. Meistens automatisch
+
+Public Domain = alles erlaubt, ohne Namensnennung
+MIT = es muss stehen dass es von mir ist, sonst alles erlaubt
+BSD-3-Clause = wie MTI + dass nicht ohne Erlaubnis mit meinem Namen Werbung gemacht werden darf
+Apache 2.0 = BSD-3 + dass FALLS Patente dem Code unterliegen, darf nicht geklagt werden solang es im Maße des Codes benutzt wird
+Unlizenziert = Quasi nichts ist erlaubt
 """
