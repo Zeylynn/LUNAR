@@ -147,25 +147,3 @@ class Environment:
         """
         for bush in self.bushes:
             bush.update()
-
-    def create_copy(self):
-        """
-        Erstellt eine frische Kopie für Simulation eines Genoms
-        __new__ ist verantwrotlich eine neue Instanz/Objekt zu erstellen => wird vor __init__ aufgerufen
-        __init__ dafür Attribute zu setzen
-        Der Vorteil ist dass Python beim erstellen via __new__ NICHT autmoatisch __init__ aufruft
-        """
-        env_copy = Environment.__new__(Environment)     # bypass __init__
-        env_copy.width = self.width
-        env_copy.height = self.height
-        env_copy.seed = self.seed
-        env_copy.terrain = self.terrain.copy()          # array1 = arry2 erstellt keine Kopie sondern eine Referenz, array  = array.copy() schon
-
-        env_copy.bushes = []
-        #NOTE wenn du nix anderes zu tun hast, kannst du schauen ob das nicht anders geht
-        for bush in self.bushes:
-            env_copy.bushes.append(copy.deepcopy(bush))         # obj1 = obj2 erstellt keine Kopie sondern eine Referenz, obj  = obj.copy() schon
-
-        env_copy.organisms = []
-
-        return env_copy

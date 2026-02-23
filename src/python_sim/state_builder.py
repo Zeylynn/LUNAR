@@ -1,51 +1,44 @@
 from python_sim.resources import Bush
-import json
 
-#TODO Falls unperformant maybe msgpack
-#TODO maybe logger einbauen
-
-class JSONBuilder:
+class StateBuilder:
     def __init__(self):
-        self.json_state = None
-        self.json_terrain = None
-        self.json_organisms = None
-        self.json_bushes = None
+        self.state = None
+        self.terrain = None
+        self.organisms = None
+        self.bushes = None
 
     def build_organisms(self, organisms):
-        """Konvertiert Organismen in JSON-Struktur"""
+        """Konvertiert Organismen in State-Struktur"""
         result = []
         for org in organisms:
             result.append(org.to_dict())
 
-        #NOTE wenn man mehr als 1 Objekt sendet muss man vielleicht mit kompatibilität schauen, z.B. \n am Ende anfügen fpr Trennung
-        self.json_organisms = json.dumps(result)
+        self.organisms = result
 
     def build_bushes(self, bushes):
-        """Konvertiert Bushes in JSON-Struktur"""
+        """Konvertiert Bushes in State-Struktur"""
         result = []
         for bush in bushes:
             result.append(bush.to_dict())
 
-        #NOTE wenn man mehr als 1 Objekt sendet muss man vielleicht mit kompatibilität schauen, z.B. \n am Ende anfügen fpr Trennung
-        self.json_bushes = json.dumps(result)
+        self.bushes = result
 
     def build_state(self, tick, tick_rate):
         result = {
             "type": "state",
             "entities": {
-                "organisms": self.json_organisms,
-                "bushes": self.json_bushes
+                "organisms": self.organisms,
+                "bushes": self.bushes
             },
             "metadata": {
                 "tick": tick,
                 "tick_rate": tick_rate
             }
         }
-
-        self.json_state = json.dumps(result)
+        self.state = result
 
     def build_terrain(self, terrain):
-        """Exportiert terrain in Godot-freundliches JSON"""
+        """Exportiert terrain in Godot-freundlichem State"""
         height = len(terrain)
         width = len(terrain[0])
 
@@ -68,7 +61,6 @@ class JSONBuilder:
             "type": "terrain",
             "size": {"width": width, "height": height},
             "terrain": terrain_out,
-            "objects": objects
+            "bushes": objects
         }
-
-        self.json_terrain = json.dumps(result)
+        self.terrain = result

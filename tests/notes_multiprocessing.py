@@ -1,7 +1,6 @@
 import multiprocessing as mp
 import time
 
-#TODO auf Race Conditions checken
 #NOTE was ist ein Global Interpreter Lock(GIL)?
 #NOTE jedes Python Programm ist ein Prozess mit einem Thread(main thread)
 

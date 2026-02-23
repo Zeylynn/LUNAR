@@ -4,8 +4,8 @@ import os
 
 # GENERELL zu imports: Python, wenn man importiert NUR beim ersten Import egal in welchem File den Code ausführt, weil es danach das File das importiert wird zwischenspeichert.
 
-#TODO Verschiedene Logs für Organismen / Simulation maybe?
 #TODO Jeder Log in einem eigenen File, alte Logs archivieren
+#NOTE Verschiedene Logs für Organismen / Simulation maybe?
 
 """
 Logging sind prinzipiell nur für Informative Sachen z.B. für Fehler die zwar passieren aber nicht schlimm genug sind die Anwendung zu unterbrechen
@@ -48,7 +48,7 @@ def get_logger(name):
     log_name = os.path.join(log_dir, f"simulation_{datum}.log") # Erstellt den Log-File Namen
 
     logger = logging.getLogger(name)
-    logger.setLevel(logging.DEBUG)  # Welche Messages die mind. ist die im Logging eingetragen wird
+    logger.setLevel(logging.INFO)  #NOTE Welche Messages die mind. ist die im Logging eingetragen wird, da ändern
 
     # Falls diese Methode 2x mit demselben Logger-Namen aufgerufen wird, wird nicht noch ein FileHandler hinzugefügt
     if not logger.handlers:

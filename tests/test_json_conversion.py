@@ -1,6 +1,7 @@
 from python_sim.world_generator import WorldGenerator
-from python_sim.json_builder import JSONBuilder
+from python_sim.state_builder import StateBuilder
 import random
+import json
 
 #TODO Unittests mit pytest
 
@@ -10,7 +11,7 @@ world = WorldGenerator(world_width=10, world_height=10, seed=seed, num_bushes=10
 world.init_world()
 terrain = world.get_terrain()
 
-builder = JSONBuilder()
+builder = StateBuilder()
 builder.build_terrain(terrain=terrain)
 
-print(builder.json_terrain)
+print(json.dumps(builder.terrain))

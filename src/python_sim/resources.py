@@ -42,7 +42,7 @@ class Bush:
             "x": int(self.x),
             "y": int(self.y),
             "max_food": self.max_food,
-            "food": self.food,
+            "food": round(self.food, 2),
             "regen_rate": self.regen_rate,
             "nutrition": self.nutrition
         }

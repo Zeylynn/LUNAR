@@ -5,7 +5,6 @@ import itertools
 #TODO NN Daten(net, genome) via JSON an Clemens schicken => für Visualisierung der "Brains"
 #TODO maybe Wasser / Food Threshold einbauen als Variable/Mutation
 #FIXME bei Life = 0 sterben sie, Life einbauen anstatt Energy
-#FIXME die Organismen sollen sterben können, nicht nur im Training...
 #NOTE maybe isWater ist ein Attirbut was automatisch gesetzt wird?
 
 class Organism:
@@ -314,8 +313,8 @@ class Organism:
             "energy": {"current": round(self.energy, 2), "max": self.max_energy},
             "water": {"current": round(self.water, 2), "max": self.max_water},
             "food": {"current": round(self.food, 2), "max": self.max_food},
-            "speed": {"current": round(self.speed, 2), "max": self.max_speed},
-            "turn_speed": {"current": round(self.turn_speed, 2), "max": self.max_turn_speed},
+            "speed": {"current": round(self.speed, 2), "max": round(self.max_speed, 2)},
+            "turn_speed": {"current": round(self.turn_speed, 2), "max": round(self.max_turn_speed)},
             "vision_range": round(self.vision_range, 2),
             "vision_fov": round(self.vision_fov, 2),
         }

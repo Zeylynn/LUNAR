@@ -3,7 +3,7 @@
 
 [NEAT]
 # Wie viele NNs pro Gen trainiert werden
-pop_size              = 100     
+pop_size              = 10     
 # [min, max, mean]      max => höchste Fitness wird weitertrainert, min => niedrigste -" "-
 fitness_criterion     = max     
 # Note: the fitness threshold will never be reached because
@@ -53,7 +53,7 @@ enabled_rate_to_false_add = 0
 enabled_rate_to_true_add = 0
 
 #NOTE da dann auf RNN switchen
-feed_forward            = True      
+feed_forward            = False      
 # Am Anfang sind alle Layers miteinander verbunden
 initial_connection      = full
 
