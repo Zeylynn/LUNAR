@@ -4,14 +4,13 @@ import itertools
 
 #TODO NN Daten(net, genome) via JSON an Clemens schicken => für Visualisierung der "Brains"
 #TODO maybe Wasser / Food Threshold einbauen als Variable/Mutation
-#FIXME bei Life = 0 sterben sie, Life einbauen anstatt Energy
 #NOTE maybe isWater ist ein Attirbut was automatisch gesetzt wird?
 
 class Organism:
     # Threadsafe d.h. wenn Instanzen in mehreren Threads erstellt werden bekommen sie trotzdem einzigartige IDs, bei Prozessen nicht
-    _id_counter = itertools.count(start=1)
+    _id_counter = itertools.count(start=1)  #NOTE pro Klasse eigener Counter
 
-    def __init__(self, x, y, angle, max_speed, max_turn_speed, vision_level, terrain):
+    def __init__(self, x, y, angle, max_speed, max_turn_speed, vision_level, environment):
         self.id = next(Organism._id_counter)
         # Position
         self.x = x
@@ -42,20 +41,19 @@ class Organism:
         self.set_vision()
 
         # Terrain
-        self.terrain = terrain
+        self.environment = environment
+        self.terrain = environment.terrain
         self.bushes = self.get_bushes()
 
         # NEAT
         self.net = None
         self.genome = None
+        self.can_mate = False
         self.ate_this_tick = False        # Für Fitness Func
         self.drank_this_tick = False      # Für Fitness Func
 
-        # ATTRIBUTES - UNUSED
-        self.life = 100
-        self.size = 1
-
         # Maybe
+        self.size = 1
         self.age = None
         self.agingSpeed = None
         self.mutationRate = None
@@ -197,19 +195,16 @@ class Organism:
                     bushes.append(obj)
         return bushes
 
-    def is_on_bush(self):
-        pass
-
     def drink(self):
         """Trinkt Wasser, wenn der Organismus auf einem Wasser-Tile steht."""
-        #TODO kontinuierliches Trinken einbauen
+        #NOTE maybe kontinuierliches Trinken einbauen
         if self.is_on_water():
             self.water = min(self.max_water, self.water + 100)
             self.drank_this_tick = True
 
     def eat(self, bush):
         """Organismus zieht 1 von bush.food ab und erhöht seine eigene Energie um bush.nutrition"""
-        #TODO kontinuierliches Essen einbauen
+        #NOTE maybe kontinuierliches Essen einbauen
         if bush.food >= 1.0:
             harvested = bush.harvest()
             self.energy = min(self.max_energy, self.energy + (harvested * bush.nutrition))
@@ -269,8 +264,9 @@ class Organism:
         throttle[0...1]
         eat_signal[0 | 1]       True > 0
         drink_signal[0 | 1]     True > 0
+        mate_signal[0 | 1]      True > 0
         """
-        turn, throttle, eat_signal, drink_signal = output
+        turn, throttle, eat_signal, drink_signal, mate_signal = output
 
         # Normalisierung, da alle Outputs tanh sind, muss ich manuell Normalisieren
         throttle = (throttle + 1) / 2       # Normalisiert auf [0...1]
@@ -298,8 +294,15 @@ class Organism:
                     self.eat(bush)
                     break
 
+        if mate_signal > 0:
+            pass
+            #FIXME implementieren, muss Energy kosten
+
         # Metabolismus
         self.metabolism()
+
+    def mate(self):
+        pass
 
     def to_dict(self):
         """Return JSON-serializable dictionary of the organism"""

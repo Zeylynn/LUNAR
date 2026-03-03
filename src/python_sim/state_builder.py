@@ -1,5 +1,7 @@
 from python_sim.resources import Bush
 
+#BUG alive in den Snapshot machen
+
 class StateBuilder:
     def __init__(self):
         self.state = None

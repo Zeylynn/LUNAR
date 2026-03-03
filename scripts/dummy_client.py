@@ -24,7 +24,7 @@ def sender(sock):
 
     while True:
         cmd = COMMAND_SEQUENCE[index]
-        message = json.dumps(cmd)
+        message = json.dumps(cmd) + "\n"
 
         try:
             sock.sendall(message.encode("utf-8"))
@@ -38,8 +38,7 @@ def sender(sock):
             break
 
         index = (index + 1) % len(COMMAND_SEQUENCE)
-        time.sleep(0.05)    #NOTE 1 Tick
-        time.sleep(4)
+        time.sleep(10)
 
 def main():
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -51,6 +50,8 @@ def main():
         send_thread = threading.Thread(target=sender, args=(s,), daemon=True)
         send_thread.start()
 
+        buffer = ""
+
         try:
             while True:
                 data = s.recv(4096)
@@ -58,15 +59,16 @@ def main():
                     print("Server closed connection")
                     break
 
-                text = data.decode("utf-8").strip()
-                lines = text.splitlines()
+                buffer += data.decode("utf-8")      #NOTE der Empfänger darf auf keinen Fall .strip() machen
 
-                for line in lines:
+                while "\n" in buffer:
+                    line, buffer = buffer.split("\n", 1)
+
                     try:
                         obj = json.loads(line)
                         print("Received JSON:", obj)
                     except json.JSONDecodeError:
-                        print("Received non-JSON data:", line)
+                        print("Invalid JSON:", line)
 
         except KeyboardInterrupt:
             print("Client interrupted, closing...")

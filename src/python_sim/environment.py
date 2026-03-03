@@ -28,6 +28,7 @@ class Environment:
         
         logger.info(f"Environment initialized | {num_organisms} Organisms | {num_bushes} Bushes")
 
+    #BUG zurzeit verwende ich pop_size UND num_organisms eines für Sim und eines für Env
     def add_organisms(self, amount):
         """
         Erstellt {amount} viele Organismen, fügt erstellte Organims self.organisms hinzu, gibt erstellte Organisms zurück
@@ -53,11 +54,15 @@ class Environment:
             max_turn_speed = math.radians(10)       # max. 10° pro Tick
             vision_level = random.uniform(0, 1)
 
-            organism = Organism(x, y, angle, max_speed, max_turn_speed, vision_level, self.terrain)
+            organism = Organism(x, y, angle, max_speed, max_turn_speed, vision_level, self)
             self.organisms.append(organism)
             ret_organisms.append(organism)
 
         return ret_organisms
+
+    def remove_organisms(self, organism):
+        if organism in self.organisms:
+            self.organisms.remove(organism)
 
     def set_seed(self, seed):
         """
@@ -82,6 +87,7 @@ class Environment:
         - curr_Speediness[0...1]            =>  speed / max_speed
         - abs_angle[-1...1]                 =>  angle / pi
         - turn_Speed[0...1]                 =>  turn_speed / max_turn_speed
+        - can_mate[0 | 1]                   =>  can_mate            #FIXME das implementieren
         --------------------------
         - Distance to closest Bush[0...1]   =>  distance / range
         - Angle to closest Bush[-1...1]     =>  angle / pi
@@ -90,7 +96,6 @@ class Environment:
         - Angle to closest Water[-1...1]    =>  angle / pi
         - Amount of seen Water[0...1]       =>  seen_water / range
         """
-        #FIXME Healthiness Später implementieren, config File Inputs anpassen           - Healthiness[0...1]        =>  health / max_health
         #NOTE maybe besserer Name für Energiness
         #NOTE Amount seen vielleicht logarithmisch machen damit 30 oder 31 wasser egal ist idk
         seen = organism.seen_objects()
@@ -125,6 +130,11 @@ class Environment:
             angle_water_norm = 0.0
             amount_water = 0.0
 
+        if thirsty >= 0.6 and hungry >= 0.6 and energy >= 0.6:
+            can_mate = True
+        else:
+            can_mate = False
+
         return [
             hungry,
             thirsty,
@@ -132,6 +142,7 @@ class Environment:
             speed_input,
             angle_input,
             turn_input,
+            can_mate,
             dist_food_norm,
             angle_food_norm,
             amount_food,

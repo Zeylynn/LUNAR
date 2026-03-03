@@ -53,24 +53,23 @@ class ServerHandler:
         await loop.sock_sendall(self.client_socket, msg.encode("utf-8"))
 
     async def recv_json(self, buffer_size=1024):
-        """Empfängt ein JSON-Objekt vom Client"""
+        """Empfängt ein JSON-Objekt vom Client, ohne JSON Decode"""
         loop = asyncio.get_running_loop()
         try:
             data = await loop.sock_recv(self.client_socket, (buffer_size))    # 1024 Bytes maximalgröße pro Nachricht
             if not data:
                 return None
         
-            self._recv_buffer += data.decode("utf-8")       #FIXME das noch fertig machen
+            self._recv_buffer += data.decode("utf-8")
 
             if "\n" in self._recv_buffer:
                 line, self._recv_buffer = self._recv_buffer.split("\n", 1)    # er splittet nur 1x, von links nach rechts
-                return line  # noch kein json.loads hier
+                return line
 
-            return None  # noch keine vollständige Nachricht
+            return None  # Falls Nachricht nicht vollständig
 
-            return data.decode("utf-8")
-        except:
-            logger.error(f"Fehler beim Empfangen vom Client")
+        except Exception as e:
+            logger.error(f"Fehler beim Empfangen vom Client: {e}")
             return None
 
     def close(self):

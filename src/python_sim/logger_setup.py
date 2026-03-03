@@ -4,7 +4,10 @@ import os
 
 # GENERELL zu imports: Python, wenn man importiert NUR beim ersten Import egal in welchem File den Code ausführt, weil es danach das File das importiert wird zwischenspeichert.
 
-#TODO Jeder Log in einem eigenen File, alte Logs archivieren
+#BUG Logger Bug fixxen => falls aprupter abbruch beim client dann unendlich viele Fehlermeldung
+#TODO für stabilen Namen, den logger Namen einmal generieren und dann übergeben, anstatt pro Instanz zu berechnen.
+# => sonst können sich bei mehrern Prozessen mehrer Log Files je nach Startzeit generieren, oder wenn ich genau bei 20:05:59 starte...
+#NOTE Jeder Log in einem eigenen File, alte Logs archivieren
 #NOTE Verschiedene Logs für Organismen / Simulation maybe?
 
 """
@@ -44,7 +47,7 @@ def get_logger(name):
     log_dir = os.path.join(base_dir, log_dir)               # absoluter Pfad zu logs => .join() berücksichtigt ../ etc.
     os.makedirs(log_dir, exist_ok=True)
 
-    datum = datetime.now().strftime("%Y-%m-%d")
+    datum = datetime.now().strftime("%Y-%m-%d_%H-%M-XX")
     log_name = os.path.join(log_dir, f"simulation_{datum}.log") # Erstellt den Log-File Namen
 
     logger = logging.getLogger(name)

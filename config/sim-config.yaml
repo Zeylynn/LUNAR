@@ -1,11 +1,20 @@
 simulation:
-  tick_rate: 20
+  tick_rate: 5
   ticks_per_snapshot: 1
   width: 15
   height: 15
   num_bushes: 10
   num_organisms: 2      #TODO das in der NEAT-Config, dieser Parameter ist unnötig/unbenutzt
   seed:
+
+#NOTE das noch einbauen
+organism:
+  max_energy: 100
+  max_food: 100
+  max_water: 100
+  max_speed: 1
+  max_turn_speed: 1
+  vision_level: 1
 
 server:
   host: "127.0.0.1"

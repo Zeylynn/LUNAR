@@ -99,21 +99,9 @@ class NEATSim:
 
     def handle_death(self, org):
         """Organismus entfernen und neues Genome spawnen"""
-        self.organisms.remove(org)
+        if org in self.organisms:
+            self.organisms.remove(org)
         self.env.remove_organism(org)
-
-        # Auswahl der Eltern (z.B. Roulette-Wheel oder Top-N)
-        #FIXME dass noch so machen dass es actually fortplanzt...
-        parents = self.select_parents()
-        child_genome = self.reproduce(parents)
-
-        # Neues Organismus erstellen
-        net = neat.nn.RecurrentNetwork.create(child_genome, self.neat_config)
-        new_org = self.env.add_organisms(1)[0]
-        new_org.net = net
-        new_org.genome = child_genome
-        child_genome.fitness = 0
-        self.organisms.append(new_org)
 
     def select_parents(self, top_k=5):
         """Top-K Organismen nach Fitness"""
@@ -144,11 +132,8 @@ class NEATSim:
 
             self.update_fitness(org)
 
-            #FIXME das unbedingt später einbauen
-            """
             if org.energy <= 0:
                 self.handle_death(org)
-            """
 
         self.tick += 1
 

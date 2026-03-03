@@ -9,16 +9,16 @@ from python_sim.server_handler import ServerHandler
 import python_sim.logger_setup as log
 from python_sim.state_builder import StateBuilder
 
-#TODO clean beenden mit shutdown_event = asyncio.Event()
+#BUG Konzept zum senden von der config überlegen
 #TODO eigene ToDo liste mit Folder oder so
 #TODO die World Gen Parameter in die config packen
-#TODO die Organism/Bush Max Werte in die config packen
+#TODO die Organism/Bush Max Werte in die config packen, wenns Sinn macht
 #TODO wenn ich das Readme schreibe, erwähnen dass wir die MIT Lizenz haben
 #TODO maybe solche Icons wie im neat-python GitHub Readme
 #TODO beim anklicken NN mit JSON Export machen
-#TODO Später maybe ein RNN statt FFW für Memory => wo war Food/Essen
 #TODO auf Race Conditions checken
 #TODO ich habe jetzt halt keine std.out reporter mehr...
+#NOTE ich könnte noch cleaner beenden mit shutdown_event = asyncio.Event()
 """
 population.add_reporter(neat.StdOutReporter(True))
 stats = neat.StatisticsReporter()
