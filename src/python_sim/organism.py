@@ -2,13 +2,14 @@ import math
 from python_sim.resources import Bush
 import itertools
 
+#FIXME generell Mating/sterben implementieren
 #TODO NN Daten(net, genome) via JSON an Clemens schicken => für Visualisierung der "Brains"
 #TODO maybe Wasser / Food Threshold einbauen als Variable/Mutation
 #NOTE maybe isWater ist ein Attirbut was automatisch gesetzt wird?
 
 class Organism:
     # Threadsafe d.h. wenn Instanzen in mehreren Threads erstellt werden bekommen sie trotzdem einzigartige IDs, bei Prozessen nicht
-    _id_counter = itertools.count(start=1)  #NOTE pro Klasse eigener Counter
+    _id_counter = itertools.count(start=1)
 
     def __init__(self, x, y, angle, max_speed, max_turn_speed, vision_level, environment):
         self.id = next(Organism._id_counter)
@@ -51,6 +52,8 @@ class Organism:
         self.can_mate = False
         self.ate_this_tick = False        # Für Fitness Func
         self.drank_this_tick = False      # Für Fitness Func
+        self.mated_this_tick = False      # Für Fitness Func
+        self.mate_range = 0.5
 
         # Maybe
         self.size = 1
@@ -64,6 +67,7 @@ class Organism:
         """Applied die NN Outputs"""
         self.ate_this_tick = False
         self.drank_this_tick = False
+        self.mated_this_tick = False
         self.apply_nn_output(output=output)
 
     def lerp(self, a, b, t):
@@ -104,13 +108,13 @@ class Organism:
         #NOTE maybe visible_water, etc. als Attribut machen
         visible_food = []
         visible_water = []
-        visible_organisms = []      #TODO Organismen auch ins Sichtfeld aufnehmen, das bei Inputs & Outputs hinzufügen
         #visible_tiles = []         wäre zur Visualisierung von dem Sichtfeld
         half_fov = self.vision_fov / 2  # halber Sichtwinkel
 
         height = len(self.terrain)
         width = len(self.terrain[0])
 
+        # --< FOOD + WATER >--
         # Suchbereich auf Sichtreichweite beschränken => 10x so wenig Tiles zum Scannen
         # z.b. bei range=10, ein Quadrat von 21x21 Felder
         for y in range(max(0, int(self.y - self.vision_range)), min(int(self.y + self.vision_range) + 1, height)):    # => +1 weil b bei range(a, b) NICHT inklusive ist
@@ -142,9 +146,29 @@ class Organism:
                         visible_food.append((x, y))
                     #visible_tiles.append((x, y))               wäre zur Visualisierung von dem Sichtfeld
 
+        visible_organisms = []
+        # --< ORGANISMS >--
+        for other in self.environment.organisms:
+            if other is self:
+                continue  # sich selbst ignorieren
+
+            dx = other.x - self.x
+            dy = other.y - self.y
+            distance = math.hypot(dx, dy)
+
+            if distance > self.vision_range:
+                continue
+
+            angle_to_other = math.atan2(dy, dx)
+            angle_diff = self.normalize_angle(angle_to_other - self.angle)
+
+            if abs(angle_diff) <= half_fov:
+                visible_organisms.append((other.x, other.y, other))
+
         return {
             "food": visible_food,
-            "water": visible_water
+            "water": visible_water,
+            "organisms": visible_organisms
         }
 
     def get_closest(self, objects):
@@ -266,6 +290,7 @@ class Organism:
         drink_signal[0 | 1]     True > 0
         mate_signal[0 | 1]      True > 0
         """
+        #TODO negatives Reward wenn der Organismus signale auf 1 stellt die nicht gehen
         turn, throttle, eat_signal, drink_signal, mate_signal = output
 
         # Normalisierung, da alle Outputs tanh sind, muss ich manuell Normalisieren
@@ -295,13 +320,142 @@ class Organism:
                     break
 
         if mate_signal > 0:
-            pass
-            #FIXME implementieren, muss Energy kosten
+            #FIXME das implementieren
+            self.mate()
 
         # Metabolismus
         self.metabolism()
 
+    def get_inputs(self):
+        """
+        Liefert eine normalisierte Liste an Sensorwerten für das neuronale Netz
+        - Hungriness[0...1]                 =>  food / max_food
+        - Thirstiness[0...1]                =>  water / max_water
+        - Energiness[0...1]                 =>  energy / max_energy
+        - curr_Speediness[0...1]            =>  speed / max_speed
+        - abs_angle[-1...1]                 =>  angle / pi
+        - turn_Speed[0...1]                 =>  turn_speed / max_turn_speed
+        - can_mate[0 | 1]                   =>  can_mate
+        --------------------------
+        - Distance to closest Bush[0...1]   =>  distance / range
+        - Angle to closest Bush[-1...1]     =>  angle / pi
+        - Amount of seen Bushes[0...1]      =>  seen_bushes / range
+        - Distance to closest Water[0...1]  =>  distance / range
+        - Angle to closest Water[-1...1]    =>  angle / pi
+        - Amount of seen Water[0...1]       =>  seen_water / range
+        - Distance to closest Org[0...1]    =>  org / range
+        - Angle to closest Org[-1...1]      =>  angle / pi
+        - Amount of seen Orgs[0...1]        =>  seen_org / range
+        """
+        #NOTE maybe besserer Name für Energiness
+        #NOTE Amount seen vielleicht logarithmisch machen damit 30 oder 31 wasser egal ist idk
+        seen = self.seen_objects()
+
+        # Stats
+        hungry = self.food / self.max_food
+        thirsty = self.water / self.max_water
+        energy = self.energy / self.max_energy
+        speed_input = self.speed / self.max_speed
+        angle_input = self.angle / math.pi
+        turn_input = self.turn_speed / self.max_turn_speed
+
+        # Nähestes Food suchen
+        if seen["food"]:
+            dist_food, angle_food = self.get_closest(seen["food"])
+            dist_food_norm = dist_food / self.vision_range
+            angle_food_norm = angle_food / math.pi
+            amount_food = min(len(seen["food"]) / self.vision_area, 1.0)
+        else:
+            dist_food_norm = 1.0  # nichts gesehen => maximale Distanz
+            angle_food_norm = 0.0
+            amount_food = 0.0
+
+        # Nähestes Wasser suchen
+        if seen["water"]:
+            dist_water, angle_water = self.get_closest(seen["water"])
+            dist_water_norm = dist_water / self.vision_range
+            angle_water_norm = angle_water / math.pi
+            amount_water = min(len(seen["water"]) / self.vision_area, 1.0)
+        else:
+            dist_water_norm = 1.0
+            angle_water_norm = 0.0
+            amount_water = 0.0
+
+        # Näheste Orgs suchen
+        if seen["organisms"]:
+            dist_org, angle_org = self.get_closest([(x, y) for x, y, _ in seen["organisms"]])
+            dist_org_norm = dist_org / self.vision_range
+            angle_org_norm = angle_org / math.pi
+            amount_org = min(len(seen["organisms"]) / self.vision_area, 1.0)
+        else:
+            dist_org_norm = 1.0
+            angle_org_norm = 0.0
+            amount_org = 0.0
+
+        if self.can_mate():
+            can_mate = True
+        else:
+            can_mate = False
+
+        return [
+            hungry,
+            thirsty,
+            energy,
+            speed_input,
+            angle_input,
+            turn_input,
+            can_mate,
+            dist_food_norm,
+            angle_food_norm,
+            amount_food,
+            dist_water_norm,
+            angle_water_norm,
+            amount_water,
+            dist_org_norm,
+            angle_org_norm,
+            amount_org
+        ]
+
+    def org_can_mate(self):
+        """
+        Prüft ob Organismus bereit zur Fortpflanzung ist
+        """
+        #NOTE irgendeinen Cooldown braucht das
+        return (
+            self.food >= 0.6 * self.max_food and
+            self.water >= 0.6 * self.max_water and
+            self.energy >= 0.6 * self.max_energy
+        )
+
+    def try_mate(self, partner):
+        """
+        Versucht sich mit einem Partner zu paaren.
+        Gibt True zurück wenn Bedingungen erfüllt sind.
+        """
+        if partner is self: #prob. redundant
+            return False
+
+        if not self.org_can_mate() or not partner.org_can_mate():
+            return False
+
+        """
+        #TODO Später Speziation beachten
+        if self.species_id != partner.species_id:
+            return False
+        """
+
+        # Distanz prüfen
+        dx = partner.x - self.x
+        dy = partner.y - self.y
+        dist = math.hypot(dx, dy)
+
+        if dist > self.mate_range:
+            return False
+
+        return True
+
     def mate(self):
+        self.mated_this_tick = True
         pass
 
     def to_dict(self):

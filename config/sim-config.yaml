@@ -1,13 +1,13 @@
 simulation:
   tick_rate: 5
   ticks_per_snapshot: 1
-  width: 15
-  height: 15
-  num_bushes: 10
-  num_organisms: 2      #TODO das in der NEAT-Config, dieser Parameter ist unnötig/unbenutzt
+  width: 30
+  height: 30
+  num_bushes: 30
+  num_organisms: 20
   seed:
 
-#NOTE das noch einbauen
+#NOTE das maybe noch einbauen
 organism:
   max_energy: 100
   max_food: 100

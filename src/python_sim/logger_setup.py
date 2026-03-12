@@ -4,7 +4,6 @@ import os
 
 # GENERELL zu imports: Python, wenn man importiert NUR beim ersten Import egal in welchem File den Code ausführt, weil es danach das File das importiert wird zwischenspeichert.
 
-#BUG Logger Bug fixxen => falls aprupter abbruch beim client dann unendlich viele Fehlermeldung
 #TODO für stabilen Namen, den logger Namen einmal generieren und dann übergeben, anstatt pro Instanz zu berechnen.
 # => sonst können sich bei mehrern Prozessen mehrer Log Files je nach Startzeit generieren, oder wenn ich genau bei 20:05:59 starte...
 #NOTE Jeder Log in einem eigenen File, alte Logs archivieren

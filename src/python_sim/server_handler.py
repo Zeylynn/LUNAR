@@ -58,7 +58,8 @@ class ServerHandler:
         try:
             data = await loop.sock_recv(self.client_socket, (buffer_size))    # 1024 Bytes maximalgröße pro Nachricht
             if not data:
-                return None
+                logger.info("Client disconnected")
+                return "DISCONNECT"
         
             self._recv_buffer += data.decode("utf-8")
 
@@ -67,6 +68,10 @@ class ServerHandler:
                 return line
 
             return None  # Falls Nachricht nicht vollständig
+
+        except (ConnectionResetError, BrokenPipeError):
+            logger.error("Client crashed / connection reset")
+            return "DISCONNECT"
 
         except Exception as e:
             logger.error(f"Fehler beim Empfangen vom Client: {e}")

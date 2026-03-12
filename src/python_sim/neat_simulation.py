@@ -47,26 +47,24 @@ class NEATSim:
             f"inputs={self.neat_config.genome_config.num_inputs}, "
             f"outputs={self.neat_config.genome_config.num_outputs}"
         )
-
+        self.neat_config.pop_size = sim_config["num_organisms"]
         self.population = neat.Population(self.neat_config)
-        self.organisms = []
 
         self.state_builder = StateBuilder()
-
         self.init_population()
 
     def init_population(self):
-        """Erstelle initiale Organismen, 1 zu 1 mit Genome in Population"""
+        """Erstelle initiale Organismen passend zur NEAT-Population"""
+        self.env.add_organisms(self.neat_config.pop_size)
+
         #TODO da nachschauen wie das funktioniert und warum das funktioniert?
         #TODO das noch mit mp.worker aufteilen
-        for _, genome in self.population.population.items():
-            #net = neat.nn.FeedForwardNetwork.create(genome, self.neat_config)
-            net = neat.nn.RecurrentNetwork.create(genome, self.neat_config)
-            org = self.env.add_organisms(1)[0]
-            org.net = net
+        for org, genome in zip(self.env.organisms, self.population.population.values()):
+            org.net = neat.nn.RecurrentNetwork.create(genome, self.neat_config)
             org.genome = genome
             genome.fitness = 0
-            self.organisms.append(org)
+
+        logger.info(f"Initialized Organisms into Environment | {self.neat_config.pop_size} Organisms")
 
     def update_fitness(self, org):
         """Fitnesskontinuierlich anpassen"""
@@ -85,6 +83,8 @@ class NEATSim:
             f += 4.0
         if org.drank_this_tick:
             f += 2.0
+        if org.mated_this_tick:
+            f += 10.0
 
         # 4. Sichtbare Ressourcen belohnen
         seen = org.seen_objects()
@@ -99,9 +99,8 @@ class NEATSim:
 
     def handle_death(self, org):
         """Organismus entfernen und neues Genome spawnen"""
-        if org in self.organisms:
-            self.organisms.remove(org)
         self.env.remove_organism(org)
+        #BUG da das dann iwie an State Builder übergeben
 
     def select_parents(self, top_k=5):
         """Top-K Organismen nach Fitness"""
@@ -125,8 +124,7 @@ class NEATSim:
         self.env.update()   # Bushes
 
         for org in list(self.organisms):
-
-            inputs = self.env.get_inputs(org)
+            inputs = org.get_inputs()
             outputs = org.net.activate(inputs)
             org.update(outputs)
 

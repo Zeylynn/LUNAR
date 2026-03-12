@@ -8,7 +8,7 @@ import copy
 logger = log.get_logger(__name__)
 
 class Environment:
-    def __init__(self, width, height, num_organisms, num_bushes, seed):
+    def __init__(self, width, height, num_bushes, seed):
         # ATTRIBUTE
         self.width = width
         self.height = height
@@ -24,18 +24,15 @@ class Environment:
         self.terrain = self.WorldGen.get_terrain()
 
         self.bushes = self.WorldGen.get_bushes()
-        self.organisms = self.add_organisms(num_organisms)
         
-        logger.info(f"Environment initialized | {num_organisms} Organisms | {num_bushes} Bushes")
+        logger.info(f"Environment initialized | {num_bushes} Bushes")
 
-    #BUG zurzeit verwende ich pop_size UND num_organisms eines für Sim und eines für Env
     def add_organisms(self, amount):
         """
         Erstellt {amount} viele Organismen, fügt erstellte Organims self.organisms hinzu, gibt erstellte Organisms zurück
         - Jedes Attribut wird zufällig zugewiesen
         - Organismen können nicht auf Wasser generieren
         """
-        ret_organisms = []
         for _ in range(amount):
             while True:
                 x = random.uniform(0, self.width)   # Exkludiert self.width deswegen ist die Spawnrange 0-99.999...
@@ -56,9 +53,6 @@ class Environment:
 
             organism = Organism(x, y, angle, max_speed, max_turn_speed, vision_level, self)
             self.organisms.append(organism)
-            ret_organisms.append(organism)
-
-        return ret_organisms
 
     def remove_organisms(self, organism):
         if organism in self.organisms:
@@ -77,79 +71,6 @@ class Environment:
         else:
             raise ValueError("seed ist out of usable range! Usable range is -9999 to 500!")
         logger.debug(f"Seed set as: {self.seed}")
-
-    def get_inputs(self, organism):
-        """
-        Liefert eine normalisierte Liste an Sensorwerten für das neuronale Netz
-        - Hungriness[0...1]                 =>  food / max_food
-        - Thirstiness[0...1]                =>  water / max_water
-        - Energiness[0...1]                 =>  energy / max_energy
-        - curr_Speediness[0...1]            =>  speed / max_speed
-        - abs_angle[-1...1]                 =>  angle / pi
-        - turn_Speed[0...1]                 =>  turn_speed / max_turn_speed
-        - can_mate[0 | 1]                   =>  can_mate            #FIXME das implementieren
-        --------------------------
-        - Distance to closest Bush[0...1]   =>  distance / range
-        - Angle to closest Bush[-1...1]     =>  angle / pi
-        - Amount of seen Bushes[0...1]      =>  seen_bushes / range
-        - Distance to closest Water[0...1]  =>  distance / range
-        - Angle to closest Water[-1...1]    =>  angle / pi
-        - Amount of seen Water[0...1]       =>  seen_water / range
-        """
-        #NOTE maybe besserer Name für Energiness
-        #NOTE Amount seen vielleicht logarithmisch machen damit 30 oder 31 wasser egal ist idk
-        seen = organism.seen_objects()
-
-        # Stats
-        hungry = organism.food / organism.max_food
-        thirsty = organism.water / organism.max_water
-        energy = organism.energy / organism.max_energy
-        speed_input = organism.speed / organism.max_speed
-        angle_input = organism.angle / math.pi
-        turn_input = organism.turn_speed / organism.max_turn_speed
-
-        # Nähestes Food suchen
-        if seen["food"]:
-            dist_food, angle_food = organism.get_closest(seen["food"])
-            dist_food_norm = dist_food / organism.vision_range
-            angle_food_norm = angle_food / math.pi
-            amount_food = min(len(seen["food"]) / organism.vision_area, 1.0)
-        else:
-            dist_food_norm = 1.0  # nichts gesehen => maximale Distanz
-            angle_food_norm = 0.0
-            amount_food = 0.0
-
-        # Nähestes Wasser suchen
-        if seen["water"]:
-            dist_water, angle_water = organism.get_closest(seen["water"])
-            dist_water_norm = dist_water / organism.vision_range
-            angle_water_norm = angle_water / math.pi
-            amount_water = min(len(seen["water"]) / organism.vision_area, 1.0)
-        else:
-            dist_water_norm = 1.0
-            angle_water_norm = 0.0
-            amount_water = 0.0
-
-        if thirsty >= 0.6 and hungry >= 0.6 and energy >= 0.6:
-            can_mate = True
-        else:
-            can_mate = False
-
-        return [
-            hungry,
-            thirsty,
-            energy,
-            speed_input,
-            angle_input,
-            turn_input,
-            can_mate,
-            dist_food_norm,
-            angle_food_norm,
-            amount_food,
-            dist_water_norm,
-            angle_water_norm,
-            amount_water
-        ]
 
     def update(self):
         """

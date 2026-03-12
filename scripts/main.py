@@ -3,13 +3,12 @@ import asyncio
 import time
 import json
 import multiprocessing as mp
-from python_sim.config_loader import load_config
+from python_sim.config_manager import load_config, merge_configs
 from python_sim.neat_simulation import NEATSim
 from python_sim.server_handler import ServerHandler
 import python_sim.logger_setup as log
 from python_sim.state_builder import StateBuilder
 
-#BUG Konzept zum senden von der config überlegen
 #TODO eigene ToDo liste mit Folder oder so
 #TODO die World Gen Parameter in die config packen
 #TODO die Organism/Bush Max Werte in die config packen, wenns Sinn macht
@@ -28,15 +27,13 @@ population.add_reporter(stats)
 logger = log.get_logger(__name__)
 
 # Evaluator Prozess
-def evaluator_process(command_queue, snapshot_queue):
-    app_config = load_config()
-
+def evaluator_process(command_queue, snapshot_queue, config):
     base_dir = os.path.dirname(os.path.abspath(__file__))
     neat_conf_file = os.path.join(base_dir, "../config/neat-config")
 
     rt_sim = NEATSim(
         neat_config_path=neat_conf_file,
-        app_config=app_config,
+        app_config=config,
     )
 
     running = True                      # Solange der Prozess läuft
@@ -109,22 +106,35 @@ async def main():
     mp.set_start_method("spawn")
     loop = asyncio.get_running_loop()
 
-    app_config = load_config()
+    base_config = load_config()
     command_queue = mp.Queue()
     snapshot_queue = mp.Queue()
 
-    evaluator = mp.Process(
-        target=evaluator_process,
-        args=(command_queue, snapshot_queue),
-        name="rt-neat-simulation"
-    )
-    evaluator.start()
-
-    server = ServerHandler(app_config["server"])
+    server = ServerHandler(base_config["server"])
     server.create_socket()
     await server.wait_for_client()      #NOTE Falls Error, maybe delay dazwischen
 
     logger.info("Client connected")
+
+    # Erster Handshake - recv config
+    data = await server.recv_json()
+    cmd = json.loads(data)
+
+    if cmd["cmd"] != "config":
+        raise RuntimeError("First command must be 'config'")
+    
+    client_config = cmd["data"]
+    config = merge_configs(base_config, client_config)
+    logger.info(f"Merged Simulation config: {config}")
+
+    evaluator = mp.Process(
+        target=evaluator_process,
+        args=(command_queue, snapshot_queue, config),
+        name="rt-neat-simulation"
+    )
+    evaluator.start()
+
+    # Zweiter Handshake - send terrain
     command_queue.put({"cmd": "get_terrain"})
 
     # SENDEN
@@ -148,6 +158,12 @@ async def main():
     async def receive_commands():
         while True:
             data = await server.recv_json()
+
+            # Falls Disconnect
+            if data == "DISCONNECT":
+                command_queue.put({"cmd": "quit"})
+                logger.warning("Client Disconnected, starting 'quit' sequence, Exiting receive_commands()")
+                break
 
             # Falls leere Nachricht
             if not data:
@@ -182,7 +198,7 @@ if __name__ == "__main__":
 
 """
 cmd queue:
-- {"cmd": "load save/config"}\n
+- {"cmd":"config, "data": {"seed": 42, ...}}\n
 - {"cmd":"start"}\n
 - {"cmd":"pause"}\n
 - {"cmd":"resume"}\n

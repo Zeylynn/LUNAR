@@ -2,7 +2,7 @@ import socket
 import json
 import time
 import threading
-from python_sim.config_loader import load_config
+from python_sim.config_manager import load_config
 
 server_config = load_config()["server"]
 
@@ -10,6 +10,7 @@ HOST = server_config["host"]
 PORT = server_config["port"]
 
 COMMAND_SEQUENCE = [
+    {"cmd": "config", "data": None},
     {"cmd": "start"},
     #{"cmd": "set_tick_rate", "tick_rate": 1},
     #{"cmd": "pause"},
