@@ -1,7 +1,5 @@
 from python_sim.resources import Bush
 
-#BUG alive in den Snapshot machen
-
 class StateBuilder:
     def __init__(self):
         self.state = None
@@ -25,7 +23,7 @@ class StateBuilder:
 
         self.bushes = result
 
-    def build_state(self, tick, tick_rate):
+    def build_state(self, tick, tick_rate, deaths):
         result = {
             "type": "state",
             "entities": {
@@ -34,7 +32,8 @@ class StateBuilder:
             },
             "metadata": {
                 "tick": tick,
-                "tick_rate": tick_rate
+                "tick_rate": tick_rate,
+                "deaths": deaths
             }
         }
         self.state = result

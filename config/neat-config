@@ -3,7 +3,8 @@
 
 [NEAT]
 # Wie viele NNs pro Gen trainiert werden
-pop_size              = 10      #NOTE der Wert wird von sim-config überschrieben
+#NOTE der Wert pop_size wird von sim-config überschrieben
+pop_size              = 10
 # [min, max, mean]      max => höchste Fitness wird weitertrainert, min => niedrigste -" "-
 fitness_criterion     = max     
 # Note: the fitness threshold will never be reached because

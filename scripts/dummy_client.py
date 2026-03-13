@@ -10,7 +10,7 @@ HOST = server_config["host"]
 PORT = server_config["port"]
 
 COMMAND_SEQUENCE = [
-    {"cmd": "config", "data": None},
+    {"cmd": "config", "data": {"simulation": {"width": "Grrrr", "height": 20, "num_bushes": 5}}},
     {"cmd": "start"},
     #{"cmd": "set_tick_rate", "tick_rate": 1},
     #{"cmd": "pause"},

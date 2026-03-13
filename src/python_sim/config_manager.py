@@ -18,9 +18,13 @@ def merge_configs(base, override):
     
     result = base.copy()
     for key, value in override.items():
-        if key in result and isinstance(value, dict):
-            result[key] = merge_configs(result[key], value)
-        else:
-            result[key] = value
+        if key in result:
+            if isinstance(value, dict):
+                result[key] = merge_configs(result[key], value)
+            # Falls der Dict wert nonesense ist
+            try:
+                result[key] = int(value)
+            except:
+                pass
 
     return result

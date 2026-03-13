@@ -21,11 +21,11 @@ class Organism:
 
         # Stats
         self.max_energy = 100
-        self.energy = self.max_energy
+        self.energy = self.max_energy / 2
         self.max_food = 100
-        self.food = self.max_food
+        self.food = self.max_food / 2
         self.max_water = 100
-        self.water = self.max_water
+        self.water = self.max_water / 2
 
         # Movement
         self.angle = angle          # in radiant weil die meisten Mathematischen Funktionen radiant erwarten
@@ -62,6 +62,8 @@ class Organism:
         self.mutationRate = None
         self.layTime = None
         self.hatchTime = None
+        self.parentID_1 = None
+        self.parentID_2 = None
 
     def update(self, output):
         """Applied die NN Outputs"""
@@ -335,7 +337,7 @@ class Organism:
         - curr_Speediness[0...1]            =>  speed / max_speed
         - abs_angle[-1...1]                 =>  angle / pi
         - turn_Speed[0...1]                 =>  turn_speed / max_turn_speed
-        - can_mate[0 | 1]                   =>  can_mate
+        - want_to_mate[0 | 1]               =>  want_to_mate
         --------------------------
         - Distance to closest Bush[0...1]   =>  distance / range
         - Angle to closest Bush[-1...1]     =>  angle / pi
@@ -392,10 +394,10 @@ class Organism:
             angle_org_norm = 0.0
             amount_org = 0.0
 
-        if self.can_mate():
-            can_mate = True
+        if self.org_can_mate():
+            want_to_mate = True
         else:
-            can_mate = False
+            want_to_mate = False
 
         return [
             hungry,
@@ -404,7 +406,7 @@ class Organism:
             speed_input,
             angle_input,
             turn_input,
-            can_mate,
+            want_to_mate,
             dist_food_norm,
             angle_food_norm,
             amount_food,
@@ -420,7 +422,7 @@ class Organism:
         """
         Prüft ob Organismus bereit zur Fortpflanzung ist
         """
-        #NOTE irgendeinen Cooldown braucht das
+        #NOTE Maten braucht irgendeinen Cooldown hätt ich gesagt
         return (
             self.food >= 0.6 * self.max_food and
             self.water >= 0.6 * self.max_water and

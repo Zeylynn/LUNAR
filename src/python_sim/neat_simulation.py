@@ -1,6 +1,5 @@
 import neat
 import python_sim.logger_setup as log
-import random                                       #NOTE später kann ich das pro.b wegtun
 from python_sim.environment import Environment
 from python_sim.state_builder import StateBuilder
 
@@ -22,11 +21,11 @@ class NEATSim:
         self.paused = False
         self.tick = 0
         self.tick_rate = sim_config["tick_rate"]
-        self.ticks_per_snapshot = sim_config["ticks_per_snapshot"]  #TODO das nochmal überdenken, ob das smart ist
+        #TODO das nochmal überdenken, ob das smart ist
+        self.ticks_per_snapshot = sim_config["ticks_per_snapshot"]
 
         self.env = Environment(width=sim_config["width"],
                                height=sim_config["height"],
-                               num_organisms=sim_config["num_organisms"],
                                num_bushes=sim_config["num_bushes"],
                                seed=sim_config["seed"])
 
@@ -51,6 +50,7 @@ class NEATSim:
         self.population = neat.Population(self.neat_config)
 
         self.state_builder = StateBuilder()
+        self.deaths_this_tick = []              #BUG überprüfen ob das geht
         self.init_population()
 
     def init_population(self):
@@ -100,11 +100,10 @@ class NEATSim:
     def handle_death(self, org):
         """Organismus entfernen und neues Genome spawnen"""
         self.env.remove_organism(org)
-        #BUG da das dann iwie an State Builder übergeben
 
     def select_parents(self, top_k=5):
         """Top-K Organismen nach Fitness"""
-        #TODO h*ly fuck das ändern
+        #FIXME h*ly fuck das ändern
         sorted_orgs = sorted(self.organisms, key=lambda o: o.genome.fitness, reverse=True)
         return [o.genome for o in sorted_orgs[:top_k]]
     
@@ -121,9 +120,10 @@ class NEATSim:
 
     def step_simulation(self):
         logger.debug(f"Tick {self.tick} running")
-        self.env.update()   # Bushes
+        self.deaths_this_tick = []
+        self.env.update()            # Bushes regrown
 
-        for org in list(self.organisms):
+        for org in list(self.env.organisms):
             inputs = org.get_inputs()
             outputs = org.net.activate(inputs)
             org.update(outputs)
@@ -131,8 +131,10 @@ class NEATSim:
             self.update_fitness(org)
 
             if org.energy <= 0:
+                self.deaths_this_tick.append(org.id)
                 self.handle_death(org)
 
+        self.env.process_mating()       #BUG das implementieren
         self.tick += 1
 
     def should_send_snapshot(self):
@@ -141,6 +143,6 @@ class NEATSim:
     def build_snapshot(self):
         self.state_builder.build_organisms(self.organisms)
         self.state_builder.build_bushes(self.env.bushes)
-        self.state_builder.build_state(self.tick, self.tick_rate)
+        self.state_builder.build_state(self.tick, self.tick_rate, self.deaths_this_tick)
 
         return self.state_builder.state

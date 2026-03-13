@@ -3,7 +3,6 @@ from python_sim.world_generator import WorldGenerator
 import random
 import math
 import python_sim.logger_setup as log
-import copy
 
 logger = log.get_logger(__name__)
 
@@ -16,6 +15,7 @@ class Environment:
         self.num_bushes = num_bushes
 
         self.organisms = []
+        self.mating_pairs = []
         self.bushes = None
 
         #NOTE maybe Threshold einstellbar machen idk, für World Gen Relevant
@@ -47,7 +47,7 @@ class Environment:
                     break
             
             angle = random.uniform(-math.pi, math.pi)
-            max_speed = random.uniform(1, 3)
+            max_speed = random.uniform(0.25, 0.75)
             max_turn_speed = math.radians(10)       # max. 10° pro Tick
             vision_level = random.uniform(0, 1)
 
@@ -71,6 +71,30 @@ class Environment:
         else:
             raise ValueError("seed ist out of usable range! Usable range is -9999 to 500!")
         logger.debug(f"Seed set as: {self.seed}")
+
+    def register_mating_pair(self, org1, org2):
+        """Paare registrieren, keine Doppelungen (A-B = B-A)"""
+        pair = tuple(sorted((org1, org2), key=lambda o: o.id))
+        if pair not in self.mating_pairs:
+            self.mating_pairs.append(pair)
+
+    def process_mating(self):
+        """Erzeugt Kinder für alle registrierten Paare"""
+        for org1, org2 in self.mating_pairs:
+            self.create_offspring(org1, org2)
+        self.mating_pairs.clear()
+
+    def create_offspring(self, parent1, parent2):
+        """Erzeugt Kind mit NEAT-Reproduktion"""
+        env_sim = parent1.env_sim  # Referenz auf NEATSim
+        child_genome = env_sim.reproduce([parent1.genome, parent2.genome])
+        net = neat.nn.RecurrentNetwork.create(child_genome, env_sim.neat_config)
+        new_org = self.add_organisms(1)[0]
+        new_org.net = net
+        new_org.genome = child_genome
+        new_org.env_sim = env_sim
+        child_genome.fitness = 0
+        env_sim.organisms.append(new_org)
 
     def update(self):
         """
