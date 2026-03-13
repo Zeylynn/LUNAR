@@ -9,8 +9,8 @@ from python_sim.server_handler import ServerHandler
 import python_sim.logger_setup as log
 from python_sim.state_builder import StateBuilder
 
-#BUG schauen welche Graphen wir alle machen weil Clemens faul ist
-#BUG Spezies inklv. Einfärbung => nach welchen Kategorien färbe ich ein
+#FIXME schauen welche Graphen wir alle machen
+#FIXME Spezies inklv. Einfärbung => nach welchen Kategorien färbe ich ein
 #TODO eigene ToDo liste mit Folder oder so
 #TODO die World Gen Parameter in die config packen
 #TODO die Organism/Bush Max Werte in die config packen, wenns Sinn macht
@@ -92,7 +92,11 @@ def evaluator_process(command_queue, snapshot_queue, config):
         sleep_time = max(0.0, tick_duration - elapsed)
 
         if started and not rt_sim.paused:
-            actual_fps = 1.0 / elapsed
+            try:
+                actual_fps = 1.0 / elapsed
+            except ZeroDivisionError:
+                actual_fps = 1.0 / 10e-5
+
             logger.debug(f"Tick {rt_sim.tick - 1} finished | duration={elapsed:.4f}s | effective FPS={actual_fps:.2f}")
 
         if sleep_time > 0.0:

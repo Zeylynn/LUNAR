@@ -2,7 +2,11 @@ import neat
 import python_sim.logger_setup as log
 from python_sim.environment import Environment
 from python_sim.state_builder import StateBuilder
+import random
 
+#FIXME Fortplanzen nochmal anschauen, maybe consent
+#FIXME schauen wegen Live NN verbesserung
+#FIXME fortplanzen um energieverbrauch & Cooldown & Speziation erweitern
 #TODO muss ich die Organismen erkennen lassen wie viel Essen pro Bush ist?
 #TODO Such/Sortieralgorithmen mit bester Performance raussuchen => o(log(n))
 #TODO später JSON LOGS damit ich die Graphen zeichnen kann, pro Gen die Fitness Werte
@@ -50,7 +54,7 @@ class NEATSim:
         self.population = neat.Population(self.neat_config)
 
         self.state_builder = StateBuilder()
-        self.deaths_this_tick = []              #BUG überprüfen ob das geht
+        self.deaths_this_tick = []
         self.init_population()
 
     def init_population(self):
@@ -100,23 +104,38 @@ class NEATSim:
     def handle_death(self, org):
         """Organismus entfernen und neues Genome spawnen"""
         self.env.remove_organism(org)
-
-    def select_parents(self, top_k=5):
-        """Top-K Organismen nach Fitness"""
-        #FIXME h*ly fuck das ändern
-        sorted_orgs = sorted(self.organisms, key=lambda o: o.genome.fitness, reverse=True)
-        return [o.genome for o in sorted_orgs[:top_k]]
     
     def reproduce(self, parents):
-        """Einfach Mutation auf zufälligen Eltern anwenden"""
-        parent = random.choice(parents)
-        # Clone Genome
-        child = parent.copy()
-        # Mutieren
+        parent1, parent2 = parents
+
+        child = self.neat_config.genome_type(
+            random.randint(0, 1_000_000)
+        )
+
+        child.configure_crossover(parent1, parent2, self.neat_config.genome_config)
+
         child.mutate(self.neat_config.genome_config)
-        # Im NEAT-Population Dictionary speichern
+
         self.population.population[child.key] = child
+
+        logger.info("REPRODUCED LETS GO!")  #BUG da noch einen guten Log rein
         return child
+
+    def process_mating(self):
+        pairs = self.env.consume_mating_pairs()
+
+        for parent1, parent2 in pairs:
+            child_genome = self.reproduce([parent1.genome, parent2.genome])
+
+            net = neat.nn.RecurrentNetwork.create(child_genome, self.neat_config)
+            self.env.add_organisms(1)       # FIXME da noch die Position von den Eltern nehmen
+
+            new_org = self.env.organisms[-1]
+
+            new_org.net = net
+            new_org.genome = child_genome
+
+            child_genome.fitness = 0
 
     def step_simulation(self):
         logger.debug(f"Tick {self.tick} running")
@@ -128,20 +147,24 @@ class NEATSim:
             outputs = org.net.activate(inputs)
             org.update(outputs)
 
+            partner = org.try_find_mate()
+            if partner:
+                self.env.register_mating_pair(org, partner)
+
             self.update_fitness(org)
 
             if org.energy <= 0:
                 self.deaths_this_tick.append(org.id)
                 self.handle_death(org)
 
-        self.env.process_mating()       #BUG das implementieren
+        self.process_mating()
         self.tick += 1
 
     def should_send_snapshot(self):
         return self.tick % self.ticks_per_snapshot == 0
 
     def build_snapshot(self):
-        self.state_builder.build_organisms(self.organisms)
+        self.state_builder.build_organisms(self.env.organisms)
         self.state_builder.build_bushes(self.env.bushes)
         self.state_builder.build_state(self.tick, self.tick_rate, self.deaths_this_tick)
 

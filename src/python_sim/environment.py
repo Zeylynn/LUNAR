@@ -54,7 +54,7 @@ class Environment:
             organism = Organism(x, y, angle, max_speed, max_turn_speed, vision_level, self)
             self.organisms.append(organism)
 
-    def remove_organisms(self, organism):
+    def remove_organism(self, organism):
         if organism in self.organisms:
             self.organisms.remove(organism)
 
@@ -73,28 +73,22 @@ class Environment:
         logger.debug(f"Seed set as: {self.seed}")
 
     def register_mating_pair(self, org1, org2):
-        """Paare registrieren, keine Doppelungen (A-B = B-A)"""
-        pair = tuple(sorted((org1, org2), key=lambda o: o.id))
+        """
+        Paare registrieren, ohne Doppelungen.
+        (A-B gilt als gleich wie B-A)
+        """
+        if org1.id < org2.id:
+            pair = (org1, org2)
+        else:
+            pair = (org2, org1)
+
         if pair not in self.mating_pairs:
             self.mating_pairs.append(pair)
 
-    def process_mating(self):
-        """Erzeugt Kinder für alle registrierten Paare"""
-        for org1, org2 in self.mating_pairs:
-            self.create_offspring(org1, org2)
-        self.mating_pairs.clear()
-
-    def create_offspring(self, parent1, parent2):
-        """Erzeugt Kind mit NEAT-Reproduktion"""
-        env_sim = parent1.env_sim  # Referenz auf NEATSim
-        child_genome = env_sim.reproduce([parent1.genome, parent2.genome])
-        net = neat.nn.RecurrentNetwork.create(child_genome, env_sim.neat_config)
-        new_org = self.add_organisms(1)[0]
-        new_org.net = net
-        new_org.genome = child_genome
-        new_org.env_sim = env_sim
-        child_genome.fitness = 0
-        env_sim.organisms.append(new_org)
+    def consume_mating_pairs(self):
+        pairs = self.mating_pairs
+        self.mating_pairs = []
+        return pairs
 
     def update(self):
         """

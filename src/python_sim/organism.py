@@ -2,7 +2,6 @@ import math
 from python_sim.resources import Bush
 import itertools
 
-#FIXME generell Mating/sterben implementieren
 #TODO NN Daten(net, genome) via JSON an Clemens schicken => für Visualisierung der "Brains"
 #TODO maybe Wasser / Food Threshold einbauen als Variable/Mutation
 #NOTE maybe isWater ist ein Attirbut was automatisch gesetzt wird?
@@ -321,9 +320,10 @@ class Organism:
                     self.eat(bush)
                     break
 
-        if mate_signal > 0:
-            #FIXME das implementieren
-            self.mate()
+        if mate_signal > 0 and self.org_can_mate():
+            self.want_mate = True
+        else:
+            self.want_mate = False
 
         # Metabolismus
         self.metabolism()
@@ -337,7 +337,7 @@ class Organism:
         - curr_Speediness[0...1]            =>  speed / max_speed
         - abs_angle[-1...1]                 =>  angle / pi
         - turn_Speed[0...1]                 =>  turn_speed / max_turn_speed
-        - want_to_mate[0 | 1]               =>  want_to_mate
+        - can_mate[0 | 1]                   =>  can_mate
         --------------------------
         - Distance to closest Bush[0...1]   =>  distance / range
         - Angle to closest Bush[-1...1]     =>  angle / pi
@@ -395,9 +395,9 @@ class Organism:
             amount_org = 0.0
 
         if self.org_can_mate():
-            want_to_mate = True
+            can_mate = True
         else:
-            want_to_mate = False
+            can_mate = False
 
         return [
             hungry,
@@ -406,7 +406,7 @@ class Organism:
             speed_input,
             angle_input,
             turn_input,
-            want_to_mate,
+            can_mate,
             dist_food_norm,
             angle_food_norm,
             amount_food,
@@ -456,9 +456,17 @@ class Organism:
 
         return True
 
-    def mate(self):
-        self.mated_this_tick = True
-        pass
+    def try_find_mate(self):
+        if not self.want_mate:
+            return None
+
+        seen = self.seen_objects()
+
+        for x, y, partner in seen["organisms"]:
+            if self.try_mate(partner):
+                return partner
+
+        return None
 
     def to_dict(self):
         """Return JSON-serializable dictionary of the organism"""
