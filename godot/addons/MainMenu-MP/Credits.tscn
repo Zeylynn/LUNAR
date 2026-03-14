@@ -1,0 +1,170 @@
+[gd_scene load_steps=3 format=3 uid="uid://gwvuxneygwb0"]
+
+[ext_resource type="Texture2D" uid="uid://dwdlj5cniqsvm" path="res://Bild.jpg" id="1_qfyht"]
+[ext_resource type="Script" uid="uid://c887w01e4g5wl" path="res://addons/MainMenu-MP/Credit.gd" id="1_u2gk2"]
+
+[node name="Credit" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_u2gk2")
+
+[node name="Background" type="ColorRect" parent="."]
+visible = false
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.05, 0.05, 0.08, 1)
+
+[node name="BackgroundPattern" type="TextureRect" parent="."]
+visible = false
+modulate = Color(0.15, 0.15, 0.18, 0.3)
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+texture = ExtResource("1_qfyht")
+expand_mode = 3
+stretch_mode = 6
+
+[node name="HintergrundBild" type="Sprite2D" parent="."]
+position = Vector2(576, 324.5)
+scale = Vector2(1.15, 1.0172414)
+texture = ExtResource("1_qfyht")
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="MainContainer" type="Control" parent="UI"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -1.0
+offset_top = -2.0
+offset_right = -1.0
+offset_bottom = -2.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Title" type="Label" parent="UI/MainContainer"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -250.0
+offset_right = 200.0
+offset_bottom = -200.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_colors/font_outline_color = Color(0.2, 0.2, 0.2, 0.8)
+theme_override_constants/outline_size = 2
+theme_override_font_sizes/font_size = 56
+text = "CREDIT"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Title2" type="Label" parent="UI/MainContainer"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -210.0
+offset_top = -106.0
+offset_right = 190.0
+offset_bottom = -29.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_colors/font_outline_color = Color(0.2, 0.2, 0.2, 0.8)
+theme_override_constants/outline_size = 2
+theme_override_font_sizes/font_size = 31
+text = "Von Valentin und Clemens"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Title3" type="Label" parent="UI/MainContainer"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -209.0
+offset_top = -40.0
+offset_right = 191.0
+offset_bottom = 37.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_colors/font_outline_color = Color(0.2, 0.2, 0.2, 0.8)
+theme_override_constants/outline_size = 2
+theme_override_font_sizes/font_size = 11
+text = " Prof Korber dürfen wir auch nicht vergessen :)"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="VersionLabel" type="Label" parent="UI/MainContainer"]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -100.0
+offset_top = -25.0
+offset_right = -10.0
+offset_bottom = -5.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_colors/font_color = Color(0.5, 0.5, 0.5, 0.8)
+theme_override_font_sizes/font_size = 10
+text = "v1.ka"
+horizontal_alignment = 2
+
+[node name="ConnectionStatusIcon" type="ColorRect" parent="UI/MainContainer"]
+visible = false
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 125.0
+offset_top = -41.0
+offset_right = 135.0
+offset_bottom = -31.0
+grow_vertical = 0
+color = Color(0.8, 0.2, 0.2, 1)
+
+[node name="AmbientLight" type="ColorRect" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0.3)
+
+[node name="BackCredits" type="Button" parent="."]
+layout_mode = 0
+offset_left = 2.0
+offset_top = 610.0
+offset_right = 242.0
+offset_bottom = 644.0
+theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 18
+text = "BACK"
+
+[connection signal="pressed" from="BackCredits" to="." method="_on_back_credits_pressed"]

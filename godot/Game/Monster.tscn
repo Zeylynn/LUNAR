@@ -1,0 +1,19 @@
+[gd_scene load_steps=4 format=3 uid="uid://bxpjsbvrvrjp4"]
+
+[ext_resource type="Texture2D" uid="uid://dxxmoim3skexx" path="res://Game/AE3.png" id="1_gj4mv"]
+[ext_resource type="Script" uid="uid://dn00cjxt1joec" path="res://Game/Monster.gd" id="1_yxgwj"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ibhxe"]
+size = Vector2(31, 28)
+
+[node name="CharacterBody2D" type="CharacterBody2D"]
+input_pickable = true
+script = ExtResource("1_yxgwj")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+rotation = 1.5707964
+scale = Vector2(1, 0.966)
+texture = ExtResource("1_gj4mv")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_ibhxe")

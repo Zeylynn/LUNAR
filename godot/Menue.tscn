@@ -1,0 +1,87 @@
+[gd_scene load_steps=6 format=3 uid="uid://c2gpuk1aha43j"]
+
+[ext_resource type="Script" uid="uid://c1c2nkwbkhihl" path="res://menue.gd" id="1_in16k"]
+[ext_resource type="VideoStream" uid="uid://f8qxplgqk06c" path="res://MinecraftDancing.ogv" id="2_o6a70"]
+[ext_resource type="Shader" uid="uid://cq25to421fsic" path="res://Menue.gdshader" id="3_pe2q4"]
+[ext_resource type="Texture2D" uid="uid://dwdlj5cniqsvm" path="res://Bild.jpg" id="4_5w1hn"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_iptsk"]
+shader = ExtResource("3_pe2q4")
+shader_parameter/blur_amount = 2.6050001237375
+
+[node name="Startscreen" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_in16k")
+
+[node name="Button1" type="Button" parent="."]
+layout_mode = 0
+offset_left = 75.0
+offset_top = 49.0
+offset_right = 568.0
+offset_bottom = 211.0
+text = "Start"
+
+[node name="Button2" type="Button" parent="."]
+layout_mode = 0
+offset_left = 75.0
+offset_top = 243.0
+offset_right = 568.0
+offset_bottom = 405.0
+text = "Load"
+
+[node name="Button3" type="Button" parent="."]
+layout_mode = 0
+offset_left = 76.0
+offset_top = 449.0
+offset_right = 569.0
+offset_bottom = 611.0
+action_mode = 0
+text = "Settings"
+
+[node name="MeinFileDialog" type="FileDialog" parent="."]
+title = "Open a File"
+ok_button_text = "Nimm Mi <3"
+cancel_button_text = "VIVI LECKT FEUCHTE HODEN"
+file_mode = 0
+access = 2
+filters = PackedStringArray("*.txt , Text Datein")
+
+[node name="Video" type="VideoStreamPlayer" parent="."]
+layout_mode = 0
+offset_left = 656.0
+offset_top = 41.0
+offset_right = 1026.0
+offset_bottom = 265.0
+mouse_filter = 2
+stream = ExtResource("2_o6a70")
+expand = true
+buffering_msec = 1000
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+show_behind_parent = true
+material = SubResource("ShaderMaterial_iptsk")
+position = Vector2(573, 326)
+scale = Vector2(1.148, 1.0188087)
+texture = ExtResource("4_5w1hn")
+
+[node name="RichTextLabel" type="RichTextLabel" parent="."]
+layout_mode = 0
+offset_left = 646.0
+offset_top = 253.0
+offset_right = 983.0
+offset_bottom = 390.0
+theme_override_colors/default_color = Color(0.36659476, 0.36659455, 0.36659467, 1)
+theme_override_colors/font_shadow_color = Color(0.0035191667, 0.0035191681, 0.0035191672, 0)
+theme_override_font_sizes/normal_font_size = 50
+text = "LUNAR"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[connection signal="pressed" from="Button1" to="." method="_on_button_1_pressed"]
+[connection signal="pressed" from="Button2" to="." method="_on_button_2_pressed"]
+[connection signal="pressed" from="Button3" to="." method="_on_button_3_pressed"]

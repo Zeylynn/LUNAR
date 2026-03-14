@@ -1,0 +1,20 @@
+[gd_scene load_steps=2 format=3 uid="uid://bukh5v13yl2og"]
+
+[ext_resource type="Script" uid="uid://df80h6g72ovcl" path="res://addons/graph_2d/graph_2d.gd" id="1_0fbet"]
+
+[node name="Control" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Graph2D" type="Control" parent="."]
+anchors_preset = 0
+offset_left = 84.0
+offset_top = 84.0
+offset_right = 1181.0
+offset_bottom = 751.0
+script = ExtResource("1_0fbet")
+metadata/_custom_type_script = "uid://df80h6g72ovcl"

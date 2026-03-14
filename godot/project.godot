@@ -10,7 +10,18 @@ config_version=5
 
 [application]
 
-config/name="dritterSteilenMein"
-run/main_scene="uid://cc6ek61e0mrcp"
-config/features=PackedStringArray("4.5", "Forward Plus")
-config/icon="res://icon.svg"
+run/main_scene="uid://cxradqn2o1i4b"
+config/features=PackedStringArray("4.5")
+
+[autoload]
+
+GameManager="*res://Game/GameManager.gd"
+
+[display]
+
+window/size/viewport_width=2300
+window/size/viewport_height=1200
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/graph_2d/plugin.cfg")

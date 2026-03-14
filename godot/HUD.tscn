@@ -1,0 +1,71 @@
+[gd_scene load_steps=4 format=3 uid="uid://d2l7e6vq066vd"]
+
+[ext_resource type="Script" uid="uid://dg8vpiijd1ay0" path="res://hud.gd" id="1_efote"]
+[ext_resource type="Script" uid="uid://df80h6g72ovcl" path="res://addons/graph_2d/graph_2d.gd" id="1_k5de2"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_efote"]
+bg_color = Color(0.9584151, 0.26131228, 0.78549093, 1)
+
+[node name="HUD" type="CanvasLayer"]
+script = ExtResource("1_efote")
+
+[node name="SidebarPanel" type="Panel" parent="."]
+custom_minimum_size = Vector2(450, 0)
+anchors_preset = 11
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -550.0
+grow_horizontal = 0
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_efote")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="SidebarPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 10
+
+[node name="LblPop" type="Label" parent="SidebarPanel/VBoxContainer"]
+layout_mode = 2
+text = "Population: 0"
+
+[node name="LblBirths" type="Label" parent="SidebarPanel/VBoxContainer"]
+layout_mode = 2
+text = "Geburten: 0"
+
+[node name="LblDeaths" type="Label" parent="SidebarPanel/VBoxContainer"]
+layout_mode = 2
+text = "Tode: 0"
+
+[node name="GraphEnergy" type="Control" parent="SidebarPanel/VBoxContainer"]
+custom_minimum_size = Vector2(0, 260)
+layout_mode = 2
+script = ExtResource("1_k5de2")
+metadata/_custom_type_script = "uid://df80h6g72ovcl"
+
+[node name="GraphFood" type="Control" parent="SidebarPanel/VBoxContainer"]
+custom_minimum_size = Vector2(0, 260)
+layout_mode = 2
+script = ExtResource("1_k5de2")
+metadata/_custom_type_script = "uid://df80h6g72ovcl"
+
+[node name="GraphWater" type="Control" parent="SidebarPanel/VBoxContainer"]
+custom_minimum_size = Vector2(0, 260)
+layout_mode = 2
+script = ExtResource("1_k5de2")
+metadata/_custom_type_script = "uid://df80h6g72ovcl"
+
+[node name="HSeparator" type="HSeparator" parent="SidebarPanel/VBoxContainer"]
+layout_mode = 2
+
+[node name="LblSelectedTitle" type="Label" parent="SidebarPanel/VBoxContainer"]
+layout_mode = 2
+text = "--- Ausgewählter Organismus ---"
+
+[node name="LblSelectedStats" type="Label" parent="SidebarPanel/VBoxContainer"]
+layout_mode = 2
+text = "Kein Organismus ausgewählt"

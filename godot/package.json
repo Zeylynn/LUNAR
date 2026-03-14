@@ -1,0 +1,19 @@
+{
+  "name": "simple-settings",
+  "version": "1.0.1",
+  "description": "A simple settings manager for Godot 4+.",
+  "productName": "Simple Settings",
+  "author": "Dan Griffiths <dgriffiths@widgitlabs.com>",
+  "private": true,
+  "repository": "https://gitlab.com/widgitgaming/godot/simple-settings",
+  "scripts": {
+    "format": "prettier --write \"**/*.{js,css,html,md,json}\" --ignore-path .gitignore",
+    "markdownlint": "npx markdownlint-cli2 --config ./config/.markdownlint-cli2.jsonc",
+    "changeloglint": "npx markdownlint-cli2 --config ./config/.kac.markdownlint-cli2.jsonc"
+  },
+  "devDependencies": {
+    "markdownlint": "^0.34.0",
+    "markdownlint-cli2": "^0.13.0",
+    "prettier": "^3.2.5"
+  }
+}

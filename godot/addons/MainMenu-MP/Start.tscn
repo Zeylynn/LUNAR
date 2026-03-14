@@ -1,0 +1,549 @@
+[gd_scene load_steps=11 format=3 uid="uid://0gnqnyb2d0d"]
+
+[ext_resource type="Script" uid="uid://1sje2lukawoc" path="res://addons/MainMenu-MP/Start.gd" id="1_a0ub5"]
+[ext_resource type="Texture2D" uid="uid://dwdlj5cniqsvm" path="res://Bild.jpg" id="2_mtk0h"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_11"]
+resource_name = "theme_toggle_button"
+bg_color = Color(0.2, 0.2, 0.2, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.4, 0.4, 0.4, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2"]
+resource_name = "black_button_hover"
+bg_color = Color(0.3, 0.3, 0.3, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.6, 0.6, 0.6, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1"]
+resource_name = "black_button_normal"
+bg_color = Color(0.15, 0.15, 0.15, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.5, 0.5, 0.5, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3"]
+resource_name = "black_button_pressed"
+bg_color = Color(0.25, 0.25, 0.25, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.7, 0.7, 0.7, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="Theme" id="Theme_1"]
+Button/styles/focus = SubResource("StyleBoxFlat_2")
+Button/styles/hover = SubResource("StyleBoxFlat_2")
+Button/styles/normal = SubResource("StyleBoxFlat_1")
+Button/styles/pressed = SubResource("StyleBoxFlat_3")
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5"]
+resource_name = "black_panel"
+bg_color = Color(0.1, 0.1, 0.1, 0.9)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.3, 0.3, 0.3, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+shadow_color = Color(0, 0, 0, 0.5)
+shadow_size = 10
+shadow_offset = Vector2(0, 4)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4"]
+resource_name = "black_input"
+bg_color = Color(0.15, 0.15, 0.15, 0.9)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.4, 0.4, 0.4, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[sub_resource type="Theme" id="Theme_2"]
+LineEdit/styles/focus = SubResource("StyleBoxFlat_4")
+LineEdit/styles/normal = SubResource("StyleBoxFlat_4")
+
+[node name="Start" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_a0ub5")
+
+[node name="Background" type="ColorRect" parent="."]
+visible = false
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+color = Color(0.05, 0.05, 0.08, 1)
+
+[node name="BackgroundPattern" type="TextureRect" parent="."]
+visible = false
+modulate = Color(0.15, 0.15, 0.18, 0.3)
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+texture = ExtResource("2_mtk0h")
+expand_mode = 3
+stretch_mode = 6
+
+[node name="HintergrundBild" type="Sprite2D" parent="."]
+position = Vector2(576, 324.5)
+scale = Vector2(1.15, 1.0172414)
+texture = ExtResource("2_mtk0h")
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="MainContainer" type="Control" parent="UI"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="SecretBtn" type="Button" parent="UI/MainContainer"]
+visible = false
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -124.0
+offset_top = 22.0
+offset_right = -17.0
+offset_bottom = 50.0
+grow_horizontal = 0
+theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_font_sizes/font_size = 14
+theme_override_styles/normal = SubResource("StyleBoxFlat_11")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_11")
+theme_override_styles/hover = SubResource("StyleBoxFlat_11")
+theme_override_styles/focus = SubResource("StyleBoxFlat_11")
+action_mode = 0
+text = "Secret Button:)"
+
+[node name="Title" type="Label" parent="UI/MainContainer"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -250.0
+offset_right = 200.0
+offset_bottom = -200.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_colors/font_outline_color = Color(0.2, 0.2, 0.2, 0.8)
+theme_override_constants/outline_size = 2
+theme_override_font_sizes/font_size = 56
+text = "GAME SETTINGS"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="MenuButtons" type="VBoxContainer" parent="UI/MainContainer"]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -120.0
+offset_top = -120.0
+offset_right = 120.0
+offset_bottom = 120.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = SubResource("Theme_1")
+
+[node name="HostGameBtn" type="Button" parent="UI/MainContainer/MenuButtons"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 18
+text = "START GAME"
+
+[node name="JoinGameBtn" type="Button" parent="UI/MainContainer/MenuButtons"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 18
+text = "LOAD GAME"
+
+[node name="ServerBrowserBtn" type="Button" parent="UI/MainContainer/MenuButtons"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 18
+text = "CREDITS"
+
+[node name="VSeparator" type="VSeparator" parent="UI/MainContainer/MenuButtons"]
+layout_mode = 2
+
+[node name="SettingsBtn" type="Button" parent="UI/MainContainer/MenuButtons"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 18
+text = "SETTINGS"
+
+[node name="QuitBtn" type="Button" parent="UI/MainContainer/MenuButtons"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 18
+text = "QUIT"
+
+[node name="NamePanel" type="Panel" parent="UI/MainContainer"]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 129.0
+offset_top = -504.0
+offset_right = 425.0
+offset_bottom = -424.0
+grow_vertical = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_5")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/MainContainer/NamePanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 15.0
+offset_top = 10.0
+offset_right = -15.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Name" type="Label" parent="UI/MainContainer/NamePanel/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
+theme_override_font_sizes/font_size = 14
+text = "Name:"
+
+[node name="NameInput" type="LineEdit" parent="UI/MainContainer/NamePanel/VBoxContainer"]
+layout_mode = 2
+theme = SubResource("Theme_2")
+theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_colors/font_placeholder_color = Color(0.6, 0.6, 0.6, 1)
+theme_override_colors/caret_color = Color(0.8, 0.8, 0.8, 1)
+placeholder_text = "Enter the name..."
+max_length = 20
+
+[node name="NamePanel" type="Panel" parent="UI/MainContainer/NamePanel"]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 129.0
+offset_top = -504.0
+offset_right = 425.0
+offset_bottom = -424.0
+grow_vertical = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_5")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/MainContainer/NamePanel/NamePanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 15.0
+offset_top = 10.0
+offset_right = -15.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Name" type="Label" parent="UI/MainContainer/NamePanel/NamePanel/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
+theme_override_font_sizes/font_size = 14
+text = "Name:"
+
+[node name="NameInput" type="LineEdit" parent="UI/MainContainer/NamePanel/NamePanel/VBoxContainer"]
+layout_mode = 2
+theme = SubResource("Theme_2")
+theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_colors/font_placeholder_color = Color(0.6, 0.6, 0.6, 1)
+theme_override_colors/caret_color = Color(0.8, 0.8, 0.8, 1)
+placeholder_text = "Enter the name..."
+max_length = 20
+
+[node name="Height" type="Panel" parent="UI/MainContainer"]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 128.0
+offset_top = -384.0
+offset_right = 428.0
+offset_bottom = -303.0
+grow_vertical = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_5")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/MainContainer/Height"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 15.0
+offset_top = 10.0
+offset_right = -15.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Height" type="Label" parent="UI/MainContainer/Height/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
+theme_override_font_sizes/font_size = 14
+text = "Height:"
+
+[node name="HeightInput" type="LineEdit" parent="UI/MainContainer/Height/VBoxContainer"]
+layout_mode = 2
+theme = SubResource("Theme_2")
+theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_colors/font_placeholder_color = Color(0.6, 0.6, 0.6, 1)
+theme_override_colors/caret_color = Color(0.8, 0.8, 0.8, 1)
+placeholder_text = "Enter the height..."
+max_length = 20
+
+[node name="Orgasismen" type="Panel" parent="UI/MainContainer"]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 129.0
+offset_top = -250.0
+offset_right = 431.0
+offset_bottom = -167.0
+grow_vertical = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_5")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/MainContainer/Orgasismen"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 15.0
+offset_top = 10.0
+offset_right = -15.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Amount" type="Label" parent="UI/MainContainer/Orgasismen/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
+theme_override_font_sizes/font_size = 14
+text = "Amount:"
+
+[node name="AmountInput" type="LineEdit" parent="UI/MainContainer/Orgasismen/VBoxContainer"]
+layout_mode = 2
+theme = SubResource("Theme_2")
+theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_colors/font_placeholder_color = Color(0.6, 0.6, 0.6, 1)
+theme_override_colors/caret_color = Color(0.8, 0.8, 0.8, 1)
+placeholder_text = "Enter the Amount of Organisms..."
+max_length = 20
+
+[node name="Seed" type="Panel" parent="UI/MainContainer"]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 678.0
+offset_top = -510.0
+offset_right = 980.0
+offset_bottom = -427.0
+grow_vertical = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_5")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/MainContainer/Seed"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 15.0
+offset_top = 10.0
+offset_right = -15.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Seed" type="Label" parent="UI/MainContainer/Seed/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
+theme_override_font_sizes/font_size = 14
+text = "Seed:"
+
+[node name="SeedInput" type="LineEdit" parent="UI/MainContainer/Seed/VBoxContainer"]
+layout_mode = 2
+theme = SubResource("Theme_2")
+theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_colors/font_placeholder_color = Color(0.6, 0.6, 0.6, 1)
+theme_override_colors/caret_color = Color(0.8, 0.8, 0.8, 1)
+placeholder_text = "Enter the Seed..."
+max_length = 20
+
+[node name="Sim" type="Panel" parent="UI/MainContainer"]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 681.0
+offset_top = -389.0
+offset_right = 983.0
+offset_bottom = -306.0
+grow_vertical = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_5")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/MainContainer/Sim"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 15.0
+offset_top = 10.0
+offset_right = -15.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="SimTicks" type="Label" parent="UI/MainContainer/Sim/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
+theme_override_font_sizes/font_size = 14
+text = "Sim Ticks:"
+
+[node name="SimTicksInput" type="LineEdit" parent="UI/MainContainer/Sim/VBoxContainer"]
+layout_mode = 2
+theme = SubResource("Theme_2")
+theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_colors/font_placeholder_color = Color(0.6, 0.6, 0.6, 1)
+theme_override_colors/caret_color = Color(0.8, 0.8, 0.8, 1)
+placeholder_text = "Enter the Sim Ticks..."
+max_length = 20
+
+[node name="VersionLabel" type="Label" parent="UI/MainContainer"]
+visible = false
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -100.0
+offset_top = -25.0
+offset_right = -10.0
+offset_bottom = -5.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_colors/font_color = Color(0.5, 0.5, 0.5, 0.8)
+theme_override_font_sizes/font_size = 10
+text = "v1.ka"
+horizontal_alignment = 2
+
+[node name="ConnectionStatusIcon" type="ColorRect" parent="UI/MainContainer"]
+visible = false
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 125.0
+offset_top = -41.0
+offset_right = 135.0
+offset_bottom = -31.0
+grow_vertical = 0
+color = Color(0.8, 0.2, 0.2, 1)
+
+[node name="Input" type="VBoxContainer" parent="UI/MainContainer"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="AmbientLight" type="ColorRect" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0.3)
+
+[node name="BackGame" type="Button" parent="."]
+layout_mode = 0
+offset_left = 1.0
+offset_top = 611.0
+offset_right = 241.0
+offset_bottom = 645.0
+theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 18
+text = "BACK"
+
+[node name="StartGame" type="Button" parent="."]
+layout_mode = 0
+offset_left = 908.0
+offset_top = 612.0
+offset_right = 1148.0
+offset_bottom = 646.0
+theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 18
+text = "START"
+
+[connection signal="button_down" from="BackGame" to="." method="_on_back_game_button_down"]
+[connection signal="pressed" from="StartGame" to="." method="_on_start_game_pressed"]
