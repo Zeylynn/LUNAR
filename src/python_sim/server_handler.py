@@ -3,7 +3,7 @@ import python_sim.logger_setup as log
 import asyncio
 import json
 
-#TODO client_connected Flag implementieren, dass man beim senden checken kann für mehr stability
+#TODO client_connected Flag implementieren, dass man beim senden checken kann für mehr stability, universell gültiges NICHT Senden
 #NOTE maybe das in normal asyncio usmchreiben, ohne Workaround
 #NOTE für max. throughput normale Sockets besser, allerdings benutzen die Byte-Streams, kein JSON
 #NOTE das File nicht Socket nennen, weil es sonst gleich heißt wie das Python-Modul => Fehler
@@ -53,7 +53,7 @@ class ServerHandler:
         msg = json.dumps(data) + "\n"   #NOTE da ist der ausgemacht Delimiter
         try:
             await loop.sock_sendall(self.client_socket, msg.encode("utf-8"))
-        except (ConnectionResetError, BrokenPipeError):
+        except (ConnectionResetError, ConnectionAbortedError, BrokenPipeError):
             logger.error("Couldn't send snapshot, Client Disconnected")
 
     async def recv_json(self, buffer_size=1024):

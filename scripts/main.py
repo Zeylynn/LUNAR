@@ -9,6 +9,7 @@ from python_sim.server_handler import ServerHandler
 import python_sim.logger_setup as log
 from python_sim.state_builder import StateBuilder
 
+#FIXME Sinnvolle Interne Werte setzen
 #FIXME schauen welche Graphen wir alle machen
 #FIXME Spezies inklv. Einfärbung => nach welchen Kategorien färbe ich ein
 #TODO eigene ToDo liste mit Folder oder so
@@ -128,6 +129,7 @@ async def main():
 
     if cmd["cmd"] != "config":
         raise RuntimeError("First command must be 'config'")
+    logger.info(f"Received from Client: {cmd}")
     
     client_config = cmd["data"]
     config = merge_configs(base_config, client_config)

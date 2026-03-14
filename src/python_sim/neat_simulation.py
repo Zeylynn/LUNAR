@@ -88,7 +88,7 @@ class NEATSim:
         if org.drank_this_tick:
             f += 2.0
         if org.mated_this_tick:
-            f += 10.0
+            f += 100.0              #BUG das nur Temporär damit sies lernen
 
         # 4. Sichtbare Ressourcen belohnen
         seen = org.seen_objects()
@@ -118,7 +118,6 @@ class NEATSim:
 
         self.population.population[child.key] = child
 
-        logger.info("REPRODUCED LETS GO!")  #BUG da noch einen guten Log rein
         return child
 
     def process_mating(self):
@@ -134,8 +133,16 @@ class NEATSim:
 
             new_org.net = net
             new_org.genome = child_genome
+            new_org.parentID_1 = parent1.id
+            new_org.parentID_2 = parent2.id
 
             child_genome.fitness = 0
+
+            logger.info(
+                f"Reproduction | tick={self.tick} | "
+                f"parents=({parent1.id},{parent2.id}) | "
+                f"child={new_org.id}"
+            )
 
     def step_simulation(self):
         logger.debug(f"Tick {self.tick} running")

@@ -53,6 +53,8 @@ class Organism:
         self.drank_this_tick = False      # Für Fitness Func
         self.mated_this_tick = False      # Für Fitness Func
         self.mate_range = 0.5
+        self.parentID_1 = None
+        self.parentID_2 = None
 
         # Maybe
         self.size = 1
@@ -61,8 +63,6 @@ class Organism:
         self.mutationRate = None
         self.layTime = None
         self.hatchTime = None
-        self.parentID_1 = None
-        self.parentID_2 = None
 
     def update(self, output):
         """Applied die NN Outputs"""
@@ -232,7 +232,7 @@ class Organism:
         #NOTE maybe kontinuierliches Essen einbauen
         if bush.food >= 1.0:
             harvested = bush.harvest()
-            self.energy = min(self.max_energy, self.energy + (harvested * bush.nutrition))
+            self.food = min(self.max_energy, self.energy + (harvested * bush.nutrition))
             self.ate_this_tick = True
 
     def metabolism(self):
@@ -298,7 +298,7 @@ class Organism:
         throttle = (throttle + 1) / 2       # Normalisiert auf [0...1]
 
         # Winkelsteuerung
-        turn_strength = turn * self.max_turn_speed
+        turn_strength = turn * self.max_turn_speed          #BUG schauen ob der Turn Speed funktioniert
         self.angle += turn_strength
         self.angle = self.normalize_angle(self.angle)
 
