@@ -12,7 +12,7 @@ var hud_instance: CanvasLayer
 # Container für Monster, damit wir sie sauber löschen können
 var monster_container: Node2D
 var selected_monster_id: int = -1
-@export var tick_rate: float = 5.0 
+@export var tick_rate: float = 1.0 
 
 var spawned_monsters: Dictionary = {}
 
@@ -123,11 +123,11 @@ func _exit_tree():
 func process_message(json_string: String):
 	var clean_string = json_string.replace("}{", "}|{")
 	
-	log_raw(json_string) 
+	log_raw(json_string)  
 	
 	# Wir splitten den String in einzelne Pakete
 	var packets = clean_string.split("|")
-	
+	#testes
 	for packet in packets:
 		if packet.strip_edges() == "":
 			continue
@@ -375,7 +375,13 @@ func spawn_or_update_monster(info: Dictionary):
 		tween.tween_property(monster, "position", target_pos, tween_duration)
 		
 		# Setze auch die Rotation flüssig um
-		tween.parallel().tween_property(monster, "rotation", angle, tween_duration)
+		# NEU: Den kürzesten Drehwinkel über die Pi-Grenze berechnen
+		var current_angle = monster.rotation
+		# Berechnet die Differenz und zwingt sie in den Bereich von -PI bis +PI
+		var angle_diff = wrapf(angle - current_angle, -PI, PI) 
+		
+		# Dem Tween sagen, er soll genau von da, wo er ist, dieses kleine Stück weitergehen
+		tween.parallel().tween_property(monster, "rotation", current_angle + angle_diff, tween_duration)
 		
 	else:
 		# --- SPAWN (Neugeborene) ---

@@ -4,7 +4,7 @@
 [ext_resource type="Script" uid="uid://df80h6g72ovcl" path="res://addons/graph_2d/graph_2d.gd" id="1_k5de2"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_efote"]
-bg_color = Color(0.9584151, 0.26131228, 0.78549093, 1)
+bg_color = Color(0.27552405, 8.892156e-06, 0.21722555, 1)
 
 [node name="HUD" type="CanvasLayer"]
 script = ExtResource("1_efote")

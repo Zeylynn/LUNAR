@@ -2,7 +2,7 @@
 
 [ext_resource type="Texture2D" uid="uid://h6s1qukcnrct" path="res://Game/Tilesetbessa.png" id="1_f3sb7"]
 [ext_resource type="PackedScene" uid="uid://cfx3c45p7d807" path="res://Game/tile_map_layer.tscn" id="1_fj7yv"]
-[ext_resource type="Script" uid="uid://5jbpgymsne5k" path="res://Game/test.gd" id="1_tlwt5"]
+[ext_resource type="Script" uid="uid://5jbpgymsne5k" path="res://Game/Simulation.gd" id="1_tlwt5"]
 [ext_resource type="Script" uid="uid://cm7sg7ia8u6p8" path="res://Game/Camera.gd" id="4_aqk2v"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_f3sb7"]
