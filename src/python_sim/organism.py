@@ -304,7 +304,7 @@ class Organism:
         mate_signal[0 | 1]      True > 0
         """
         #TODO negatives Reward wenn der Organismus signale auf 1 stellt die nicht gehen
-        turn, throttle, eat_signal, drink_signal, mate_signal = output
+        turn, throttle, self.eat_signal, self.drink_signal, self.mate_signal = output
 
         # Normalisierung, da alle Outputs tanh sind, muss ich manuell Normalisieren
         throttle = (throttle + 1) / 2       # Normalisiert auf [0...1]
