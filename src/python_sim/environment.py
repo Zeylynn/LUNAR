@@ -48,7 +48,7 @@ class Environment:
             
             angle = random.uniform(-math.pi, math.pi)
             max_speed = random.uniform(0.25, 0.75)
-            max_turn_speed = math.radians(10)       # max. 10° pro Tick
+            max_turn_speed = math.radians(60)       # max. 60° pro Tick
             vision_level = random.uniform(0, 1)
 
             organism = Organism(x, y, angle, max_speed, max_turn_speed, vision_level, self)

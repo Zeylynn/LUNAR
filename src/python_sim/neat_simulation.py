@@ -78,26 +78,34 @@ class NEATSim:
         f += 0.1
 
         # 2. Ressourcenlevel
-        f += org.energy / org.max_energy
-        f += org.food / org.max_food
-        f += org.water / org.max_water
+        f += 0.5 * (org.energy / org.max_energy)
+        f += 0.3 * (org.food / org.max_food)
+        f += 0.3 * (org.water / org.max_water)
 
         # 3. Essen/Trinken
         if org.ate_this_tick:
-            f += 4.0
+            f += 5.0
+        elif org.eat_signal > 0:  # Signal gesetzt, aber kein Essen möglich
+            f -= 1.0 
+
         if org.drank_this_tick:
-            f += 2.0
+            f += 4.0
+        elif org.drink_signal > 0:
+            f -= 1.0
+
         if org.mated_this_tick:
-            f += 100.0              #BUG das nur Temporär damit sies lernen
+            f += 20.0
+        elif org.mate_signal > 0:
+            f -= 2.0
 
         # 4. Sichtbare Ressourcen belohnen
         seen = org.seen_objects()
         if seen["food"]:
             dist_food, _ = org.get_closest(seen["food"])
-            f += (org.vision_range - dist_food) / org.vision_range
+            f += 0.5 * (org.vision_range - dist_food) / org.vision_range
         if seen["water"]:
             dist_water, _ = org.get_closest(seen["water"])
-            f += (org.vision_range - dist_water) / org.vision_range
+            f += 0.5 * (org.vision_range - dist_water) / org.vision_range
 
         org.genome.fitness = f
 
@@ -137,6 +145,14 @@ class NEATSim:
             new_org.parentID_2 = parent2.id
 
             child_genome.fitness = 0
+
+            parent1.energy -= parent1.reproduction_cost
+            parent1.mate_cooldown = parent1.mate_cooldown_max
+            parent1.mated_this_tick = True
+
+            parent2.energy -= parent2.reproduction_cost
+            parent2.mate_cooldown = parent2.mate_cooldown_max
+            parent2.mated_this_tick = True
 
             logger.info(
                 f"Reproduction | tick={self.tick} | "

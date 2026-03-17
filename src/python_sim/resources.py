@@ -3,7 +3,7 @@ import itertools
 class Bush:
     _id_counter = itertools.count(start=1)
 
-    def __init__(self, x, y, max_food=3, regen_rate=0.05):
+    def __init__(self, x, y, max_food=3, regen_rate=0.025):
         self.id = next(Bush._id_counter)
 
         # float damit man u.a. mit Organismus Koordinaten vergleichen kann

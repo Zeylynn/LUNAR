@@ -1,10 +1,10 @@
 simulation:
-  tick_rate: 5
+  tick_rate: 25
   ticks_per_snapshot: 1
-  width: 40
-  height: 20
-  num_bushes: 30
-  num_organisms: 20
+  width: 80
+  height: 80
+  num_bushes: 100
+  num_organisms: 150
   seed:
 
 #NOTE das maybe noch einbauen
