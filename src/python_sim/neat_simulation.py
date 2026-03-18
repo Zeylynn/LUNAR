@@ -161,7 +161,45 @@ class NEATSim:
             for org in self.env.organisms:
                 self.live_mutate(org)
 
+        if self.tick % 50 == 0:
+            self.log_population_stats()
+            self.log_top_organism()
+
         self.tick += 1
+
+    def log_population_stats(self):
+        genomes = [org.genome for org in self.env.organisms if hasattr(org, "genome")]
+
+        if not genomes:
+            return
+
+        fitness_values = [g.fitness for g in genomes]
+
+        avg = sum(fitness_values) / len(fitness_values)
+        best = max(fitness_values)
+        worst = min(fitness_values)
+
+        logger.info(
+            f"[STATS] Tick={self.tick} | "
+            f"Pop={len(genomes)} | "
+            f"AvgFit={avg:.2f} | "
+            f"BestFit={best:.2f} | "
+            f"WorstFit={worst:.2f}"
+        )
+
+    def log_top_organism(self):
+        if not self.env.organisms:
+            return  
+
+        best = max(self.env.organisms, key=lambda o: o.genome.fitness)
+
+        logger.info(
+            f"[TOP] ID={best.id} | "
+            f"Fitness={best.genome.fitness:.2f} | "
+            f"Energy={best.energy:.1f} | "
+            f"Food={best.food:.1f} | "
+            f"Water={best.water:.1f}"
+        )
 
     def should_send_snapshot(self):
         return self.tick % self.ticks_per_snapshot == 0
