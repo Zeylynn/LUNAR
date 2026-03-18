@@ -1,11 +1,22 @@
 simulation:
-  tick_rate: 25
+  tick_rate: 10
   ticks_per_snapshot: 1
   width: 80
   height: 80
   num_bushes: 100
   num_organisms: 150
   seed:
+
+neat:
+  eval_interval: 50
+  live_mutation_strength: 0.05
+  live_weight_perturb: 0.05
+  live_structural_prob: 0.01
+  live_add_node_prob: 0.002
+
+server:
+  host: "127.0.0.1"
+  port: 9001
 
 #NOTE das maybe noch einbauen
 organism:
@@ -15,7 +26,3 @@ organism:
   max_speed: 1
   max_turn_speed: 1
   vision_level: 1
-
-server:
-  host: "127.0.0.1"
-  port: 9001

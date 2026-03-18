@@ -29,9 +29,6 @@ class Organism:
 
         # Movement
         self.angle = angle          # in radiant weil die meisten Mathematischen Funktionen radiant erwarten
-        #NOTE später vielleicht wieder reinmachen als Evolutionierbaren Stat
-        #self.acceleration = 0.2
-
         self.max_speed = max_speed
         self.speed = 0.0
         self.max_turn_speed = max_turn_speed
@@ -49,13 +46,6 @@ class Organism:
         # NEAT
         self.net = None
         self.genome = None
-        self.can_mate = False
-        self.ate_this_tick = False        # Für Fitness Func
-        self.drank_this_tick = False      # Für Fitness Func
-        self.eat_signal = None
-
-        # Mating
-        self.mated_this_tick = False      # Für Fitness Func
         self.mate_range = 0.5
         self.parentID_1 = None
         self.parentID_2 = None
@@ -70,15 +60,7 @@ class Organism:
         self.mutationRate = None
         self.layTime = None
         self.hatchTime = None
-
-    def update(self, output):
-        """Applied die NN Outputs"""
-        self.ate_this_tick = False
-        self.drank_this_tick = False
-        self.mated_this_tick = False
-        if self.mate_cooldown > 0:
-            self.mate_cooldown -= 1
-        self.apply_nn_output(output=output)
+        self.acceleration = 0.2
 
     def lerp(self, a, b, t):
         """Lineare Interpolation, z.B. für die Vision"""
@@ -229,21 +211,6 @@ class Organism:
                     bushes.append(obj)
         return bushes
 
-    def drink(self):
-        """Trinkt Wasser, wenn der Organismus auf einem Wasser-Tile steht."""
-        #NOTE maybe kontinuierliches Trinken einbauen
-        if self.is_on_water():
-            self.water = min(self.max_water, self.water + 100)
-            self.drank_this_tick = True
-
-    def eat(self, bush):
-        """Organismus zieht 1 von bush.food ab und erhöht seine eigene Energie um bush.nutrition"""
-        #NOTE maybe kontinuierliches Essen einbauen
-        if bush.food >= 1.0:
-            harvested = bush.harvest()
-            self.food = min(self.max_food, self.food + (harvested * bush.nutrition))
-            self.ate_this_tick = True
-
     def metabolism(self):
         """
         Standard Wasser | Food | Energie Kosten pro Tick.
@@ -304,40 +271,74 @@ class Organism:
         mate_signal[0 | 1]      True > 0
         """
         #TODO negatives Reward wenn der Organismus signale auf 1 stellt die nicht gehen
-        turn, throttle, self.eat_signal, self.drink_signal, self.mate_signal = output
+        turn, throttle, eat_signal, drink_signal, mate_signal = output
+        reward = 0.0
 
         # Normalisierung, da alle Outputs tanh sind, muss ich manuell Normalisieren
         throttle = (throttle + 1) / 2       # Normalisiert auf [0...1]
+        self.speed = throttle * self.max_speed
 
         # Winkelsteuerung
         self.angle += turn * self.max_turn_speed
         self.angle = self.normalize_angle(self.angle)
 
-        # Geschwindigkeitssteuerung
-        self.speed = throttle * self.max_speed
-
-        # Bewegung
         self.move()
 
         # Trinken
-        if self.drink_signal > 0.5:
-            self.drink()
+        if drink_signal > 0:
+            if self.is_on_water():
+                self.water = min(self.max_water, self.water + 50)
+                reward += 4.0
+            else:
+                reward -= 1.0
 
         # Essen
-        if self.eat_signal > 0.5:
+        if eat_signal > 0:
+            eaten = False
             # Wenn in der Nähe, Esse
             for bush in self.bushes:
                 if abs(bush.x - self.x) < 1 and abs(bush.y - self.y) < 1:
-                    self.eat(bush)
+                    harvested = bush.harvest()
+                    self.food = min(self.max_food, self.food + (harvested * bush.nutrition))
+                    eaten = True
+                    reward += 5.0
                     break
 
-        if self.mate_signal > 0.5 and self.org_can_mate():
-            self.want_mate = True
+            if not eaten:
+                reward -= 1.0
+
+        if mate_signal > 0:
+            if self.org_can_mate():
+                self.want_mate = True
+                reward += 1.0
+            else:
+                self.want_mate = False
+                reward -= 2.0
         else:
             self.want_mate = False
 
         # Metabolismus
         self.metabolism()
+
+        # 1. Überleben
+        reward += 0.1
+
+        # 2. Ressourcenlevel
+        reward += 0.5 * (self.energy / self.max_energy)
+        reward += 0.3 * (self.food / self.max_food)
+        reward += 0.3 * (self.water / self.max_water)
+
+        # 4. Sichtbare Ressourcen belohnen
+        seen = self.seen_objects()
+
+        if seen["food"]:
+            dist_food, _ = self.get_closest(seen["food"])
+            reward += (self.vision_range - dist_food) / self.vision_range
+        if seen["water"]:
+            dist_water, _ = self.get_closest(seen["water"])
+            reward += (self.vision_range - dist_water) / self.vision_range
+
+        return reward
 
     def get_inputs(self):
         """
