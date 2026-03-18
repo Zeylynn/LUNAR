@@ -21,20 +21,24 @@ logger = log.get_logger(__name__)
 class NEATSim:
     def __init__(self, neat_config_path, app_config):
         sim_config = app_config["simulation"]
+        my_neat_config = app_config["neat"]
 
         self.paused = False
         self.tick = 0
         self.tick_rate = sim_config["tick_rate"]
-        #TODO das nochmal überdenken, ob das smart ist
         self.ticks_per_snapshot = sim_config["ticks_per_snapshot"]
+
+        # RT-NEAT spezifische Parameter
+        self.eval_interval = my_neat_config["eval_interval"]                    # wie oft live-update läuft
+        self.live_mutation_strength = my_neat_config["live_mutation_strength"]  #BUG das noch nachschauen
+        self.live_weight_perturb = my_neat_config["live_weight_perturb"]        # max Änderungsbetrag
+        self.live_structural_prob = my_neat_config["live_structural_prob"]      # Chance neue Conn
+        self.live_add_node_prob = my_neat_config["live_add_node_prob"]          # Chance neuen Node
 
         self.env = Environment(width=sim_config["width"],
                                height=sim_config["height"],
                                num_bushes=sim_config["num_bushes"],
-                               seed=sim_config["seed"])
-
-        #NOTE für Visualisierung ausklammern
-        #self.env.WorldGen.visualize() 
+                               seed=sim_config["seed"]) 
 
         # NEAT Config laden
         self.neat_config = neat.Config(
@@ -57,49 +61,86 @@ class NEATSim:
         self.deaths_this_tick = []
         self.init_population()
 
+    def _unique_key(self):
+        """Garantiert einzigartigen Genome-Key."""
+        while True:
+            key = random.randint(0, 2**31 - 1)
+            if key not in self.population.population:
+                return key
+
     def init_population(self):
         """Erstelle initiale Organismen passend zur NEAT-Population"""
         self.env.add_organisms(self.neat_config.pop_size)
 
-        #TODO da nachschauen wie das funktioniert und warum das funktioniert?
-        #TODO das noch mit mp.worker aufteilen
-        for org, genome in zip(self.env.organisms, self.population.population.values()):
+        genomes_list = list(self.population.population.items())  # (key, genome)
+
+        # Zuordnung: genome -> organism
+        for (genome_key, genome), org in zip(genomes_list, self.env.organisms):
             org.net = neat.nn.RecurrentNetwork.create(genome, self.neat_config)
             org.genome = genome
-            genome.fitness = 0
+            genome.fitness = 0.0
 
-        logger.info(f"Initialized Organisms into Environment | {self.neat_config.pop_size} Organisms")
+        logger.info(f"Initialized {len(self.env.organisms)} Organisms into Environment")
 
-    def update_fitness(self, org):
-        """Fitnesskontinuierlich anpassen"""
-        f = org.genome.fitness
+    def live_update_genome(self, org):
+        """
+        Führt kleine, lokale Änderungen am Genom des lebenden Organismus durch,
+        damit Learning 'on-the-fly' möglich wird. Änderungen sind bewusst klein.
+        """
+        genome = org.genome
 
-        # 1. Überleben
-        f += 0.1
+        # 1) kleine perturbation der vorhandenen connection-weights
+        # connection gene dict: genome.connections -> {innovation: ConnectionGene}
+        for cg in genome.connections.values():
+            # delta abhängig von live_weight_perturb, eventuell skaliert durch fitness (schlechte lernen stärker)
+            # clamp: [-perturb, +perturb]
+            # Skala: schlechtere Genome dürfen stärker angepasst werden
+            fitness_scale = 1.0
+            if hasattr(genome, "fitness"):
+                # invertierte Skala: schlechtere genome -> größeres delta
+                fitness_scale = max(0.1, 1.0 - (genome.fitness / (genome.fitness + 100.0)))
+            delta = random.uniform(-self.live_weight_perturb, self.live_weight_perturb) * fitness_scale
+            cg.weight += delta
 
-        # 2. Ressourcenlevel
-        f += org.energy / org.max_energy
-        f += org.food / org.max_food
-        f += org.water / org.max_water
+        # 2) mit sehr kleiner Wahrscheinlichkeit strukturelle Mutation durchführen
+        # nutzen die in neat-python vorhandenen Mutationsroutinen falls verfügbar
+        if random.random() < self.live_structural_prob:
+            try:
+                genome.mutate_add_connection(self.neat_config.genome_config)
+            except Exception:
+                # Fallback: generische mutate mit sehr konservativen Wahrscheinlichkeiten
+                genome.mutate(self.neat_config.genome_config)
 
-        # 3. Essen/Trinken
-        if org.ate_this_tick:
-            f += 4.0
-        if org.drank_this_tick:
-            f += 2.0
-        if org.mated_this_tick:
-            f += 100.0              #BUG das nur Temporär damit sies lernen
+        if random.random() < self.live_add_node_prob:
+            try:
+                genome.mutate_add_node(self.neat_config.genome_config)
+            except Exception:
+                genome.mutate(self.neat_config.genome_config)
 
-        # 4. Sichtbare Ressourcen belohnen
-        seen = org.seen_objects()
-        if seen["food"]:
-            dist_food, _ = org.get_closest(seen["food"])
-            f += (org.vision_range - dist_food) / org.vision_range
-        if seen["water"]:
-            dist_water, _ = org.get_closest(seen["water"])
-            f += (org.vision_range - dist_water) / org.vision_range
+        # 3) WICHTIG: Netz aktualisieren, damit Änderungen sofort wirksam werden
+        org.net = neat.nn.RecurrentNetwork.create(genome, self.neat_config)
 
-        org.genome.fitness = f
+    def live_evaluate(self):
+        """
+        Optional: berechne live_statistiken aller Genome (wird alle eval_interval Ticks aufgerufen).
+        Hier werden keine Genome erzeugt — nur Stats & ggf. smoothing berechnet.
+        """
+        genomes = list(self.population.population.values())
+        if not genomes:
+            return
+
+        scores = [max(0.0, g.fitness) for g in genomes]
+        total = sum(scores)
+        if total <= 0:
+            for g in genomes:
+                g.live_weight = 1.0 / len(genomes)
+        else:
+            for g, s in zip(genomes, scores):
+                g.live_weight = s / total
+
+        avg = sum(scores) / len(scores) if genomes else 0.0
+        top = max(scores) if scores else 0.0
+        logger.info(f"Live-eval @tick {self.tick}: top={top:.2f}, avg={avg:.2f}")
 
     def handle_death(self, org):
         """Organismus entfernen und neues Genome spawnen"""
@@ -108,9 +149,8 @@ class NEATSim:
     def reproduce(self, parents):
         parent1, parent2 = parents
 
-        child = self.neat_config.genome_type(
-            random.randint(0, 1_000_000)
-        )
+        child_key = self._unique_key()
+        child = self.neat_config.genome_type(child_key)
 
         child.configure_crossover(parent1, parent2, self.neat_config.genome_config)
 
@@ -127,9 +167,11 @@ class NEATSim:
             child_genome = self.reproduce([parent1.genome, parent2.genome])
 
             net = neat.nn.RecurrentNetwork.create(child_genome, self.neat_config)
-            self.env.add_organisms(1)       # FIXME da noch die Position von den Eltern nehmen
+            self.env.add_organisms(1)
 
             new_org = self.env.organisms[-1]
+            new_org.x = (parent1.x + parent2.x) / 2.0 + random.uniform(-0.5, 0.5)
+            new_org.y = (parent1.y + parent2.y) / 2.0 + random.uniform(-0.5, 0.5)
 
             new_org.net = net
             new_org.genome = child_genome
@@ -137,6 +179,14 @@ class NEATSim:
             new_org.parentID_2 = parent2.id
 
             child_genome.fitness = 0
+
+            parent1.energy -= parent1.reproduction_cost
+            parent1.mate_cooldown = getattr(parent1, "mate_cooldown_max", parent1.mate_cooldown)
+            parent1.mated_this_tick = True
+
+            parent2.energy -= parent2.reproduction_cost
+            parent2.mate_cooldown = getattr(parent2, "mate_cooldown_max", parent2.mate_cooldown)
+            parent2.mated_this_tick = True
 
             logger.info(
                 f"Reproduction | tick={self.tick} | "
@@ -152,7 +202,6 @@ class NEATSim:
         for org in list(self.env.organisms):
             inputs = org.get_inputs()
             outputs = org.net.activate(inputs)
-            org.update(outputs)
 
             partner = org.try_find_mate()
             if partner:

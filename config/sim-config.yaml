@@ -7,6 +7,17 @@ simulation:
   num_organisms: 20
   seed:
 
+neat:
+  eval_interval: 50
+  live_mutation_strength: 0.05
+  live_weight_perturb: 0.05
+  live_structural_prob: 0.01
+  live_add_node_prob: 0.002
+
+server:
+  host: "127.0.0.1"
+  port: 9001
+
 #NOTE das maybe noch einbauen
 organism:
   max_energy: 100
@@ -15,7 +26,3 @@ organism:
   max_speed: 1
   max_turn_speed: 1
   vision_level: 1
-
-server:
-  host: "127.0.0.1"
-  port: 9001
