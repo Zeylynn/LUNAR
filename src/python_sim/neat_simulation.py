@@ -20,7 +20,7 @@ import random
 logger = log.get_logger(__name__)
 
 class NEATSim:
-    def __init__(self, neat_config_path, app_config):
+    def __init__(self, neat_config_path, app_config, pretrained_genoms=None):
         sim_config = app_config["simulation"]
         my_neat_config = app_config["neat"]
 
@@ -68,7 +68,10 @@ class NEATSim:
         """Erstellt initiale Organismen Bevölkerung"""
         self.env.add_organisms(self.neat_config.pop_size)
 
-        genomes = list(self.population.population.values())
+        if self.pretrained_genomes:
+            genomes = self.pretrained_genomes
+        else:
+            genomes = list(self.population.population.values())
 
         for org, genome in zip(self.env.organisms, genomes):
             org.genome = genome

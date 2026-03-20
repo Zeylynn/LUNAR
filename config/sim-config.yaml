@@ -30,6 +30,9 @@ organism:
 #NOTE zurzeit food/water consumption unused...
 
 neat:
+  pre_train:
+    num_gens: 10
+    gen_ticks: 500
   eval_interval: 25
   live_mutation_strength: 0.05
   live_weight_perturb: 0.05

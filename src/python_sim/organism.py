@@ -312,6 +312,7 @@ class Organism:
             if not eaten:
                 reward -= 1.0
 
+        #BUG das ist jetzt beim Pre Train halt auch dabei
         if mate_signal > 0.5:
             self.energy -= 0.5      #BUG da noch konkrete Werte finden, wenn maten was kostet dann lernen sies besser
 
