@@ -1,28 +1,42 @@
 simulation:
   tick_rate: 10
   ticks_per_snapshot: 1
-  width: 80
-  height: 80
-  num_bushes: 100
-  num_organisms: 150
+  width: 40
+  height: 40
+  num_bushes: 120
+  num_organisms: 100
   seed:
 
+organism:
+  org_stats:
+    max_energy: 100
+    max_food: 100
+    max_water: 100
+    max_speed: 0.5
+    max_turn_speed: 60
+    vision_level: 0.5
+    mate_range: 10
+    mate_cooldown_max: 1
+    reproduction_cost: 1
+  sim_stats:
+    food_consumption: 0.25
+    food_threshold: 0.25
+    water_consumption: 0.25
+    water_threshold: 0.25
+    energy:
+      std_gain: 2
+      std_loss: 0.33
+      movement_loss_factor: 0.5
+#NOTE zurzeit food/water consumption unused...
+
 neat:
-  eval_interval: 50
+  eval_interval: 25
   live_mutation_strength: 0.05
   live_weight_perturb: 0.05
   live_structural_prob: 0.01
   live_add_node_prob: 0.002
+  fitness_dropoff: 0.012
 
 server:
   host: "127.0.0.1"
   port: 9001
-
-#NOTE das maybe noch einbauen
-organism:
-  max_energy: 100
-  max_food: 100
-  max_water: 100
-  max_speed: 1
-  max_turn_speed: 1
-  vision_level: 1

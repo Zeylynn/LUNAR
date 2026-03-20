@@ -4,6 +4,7 @@ from python_sim.environment import Environment
 from python_sim.state_builder import StateBuilder
 import random
 
+#TODO Evolution einbauen, also Attribute bei Fortpflanzung leicht ändern
 #FIXME Fortplanzen nochmal anschauen, maybe consent
 #FIXME schauen wegen Live NN verbesserung
 #FIXME fortplanzen um energieverbrauch & Cooldown & Speziation erweitern
@@ -29,6 +30,7 @@ class NEATSim:
         self.ticks_per_snapshot = sim_config["ticks_per_snapshot"]
 
         # RT-NEAT spezifische Parameter
+        self.fitness_dropoff = my_neat_config["fitness_dropoff"]
         self.eval_interval = my_neat_config["eval_interval"]                    # wie oft live-update läuft
         self.live_mutation_strength = my_neat_config["live_mutation_strength"]  #BUG das noch nachschauen
         self.live_weight_perturb = my_neat_config["live_weight_perturb"]        # max Änderungsbetrag
@@ -38,7 +40,8 @@ class NEATSim:
         self.env = Environment(width=sim_config["width"],
                                height=sim_config["height"],
                                num_bushes=sim_config["num_bushes"],
-                               seed=sim_config["seed"]) 
+                               seed=sim_config["seed"],
+                               org_config=app_config["organism"]) 
 
         # NEAT Config laden
         self.neat_config = neat.Config(
@@ -121,13 +124,15 @@ class NEATSim:
             new_org.parentID_1 = parent1.id
             new_org.parentID_2 = parent2.id
 
-            child_genome.fitness = 0
+            child_genome.fitness = 0    #BUG maybe is das ein Fehler
 
             parent1.energy -= parent1.reproduction_cost
             parent1.mate_cooldown = parent1.mate_cooldown_max
+            parent1.genome.fitness += 15.0
 
             parent2.energy -= parent2.reproduction_cost
             parent2.mate_cooldown = parent2.mate_cooldown_max
+            parent2.genome.fitness += 15.0
 
             logger.info(
                 f"Reproduction | tick={self.tick} | "
@@ -147,6 +152,8 @@ class NEATSim:
             reward = org.apply_nn_output(outputs)
             org.genome.fitness += reward
 
+            org.fitness_signal = org.genome.fitness
+
             partner = org.try_find_mate()
             if partner:
                 self.env.register_mating_pair(org, partner)
@@ -154,6 +161,8 @@ class NEATSim:
             if org.energy <= 0:
                 self.deaths_this_tick.append(org.id)
                 self.handle_death(org)
+
+            org.genome.fitness = org.genome.fitness * (1 - self.fitness_dropoff) 
 
         self.process_mating()
 

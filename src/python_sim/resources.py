@@ -3,7 +3,7 @@ import itertools
 class Bush:
     _id_counter = itertools.count(start=1)
 
-    def __init__(self, x, y, max_food=3, regen_rate=0.025):
+    def __init__(self, x, y, max_food=3, regen_rate=0.05):
         self.id = next(Bush._id_counter)
 
         # float damit man u.a. mit Organismus Koordinaten vergleichen kann
@@ -12,7 +12,7 @@ class Bush:
         self.food = max_food
         self.max_food = max_food
         self.regen_rate = regen_rate
-        self.nutrition = 1                    # Wie viel Energie ein "Apfel" auffüllt, Faktor
+        self.nutrition = 50                    # Wie viel Energie ein "Apfel" auffüllt, Faktor
 
     def update(self):
         """aktualisiert self.food um die self.regen_rate, bis zu einem maximum von self.max_food"""

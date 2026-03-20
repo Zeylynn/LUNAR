@@ -7,12 +7,13 @@ import python_sim.logger_setup as log
 logger = log.get_logger(__name__)
 
 class Environment:
-    def __init__(self, width, height, num_bushes, seed):
+    def __init__(self, width, height, num_bushes, seed, org_config):
         # ATTRIBUTE
         self.width = width
         self.height = height
         self.set_seed(seed)
         self.num_bushes = num_bushes
+        self.org_config = org_config
 
         self.organisms = []
         self.mating_pairs = []
@@ -47,11 +48,8 @@ class Environment:
                     break
             
             angle = random.uniform(-math.pi, math.pi)
-            max_speed = random.uniform(0.25, 0.75)
-            max_turn_speed = math.radians(60)       # max. 60° pro Tick
-            vision_level = random.uniform(0, 1)
 
-            organism = Organism(x, y, angle, max_speed, max_turn_speed, vision_level, self)
+            organism = Organism(x=x, y=y, angle=angle, environment=self, org_config=self.org_config)
             self.organisms.append(organism)
 
     def remove_organism(self, organism):

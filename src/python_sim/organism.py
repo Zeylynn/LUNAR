@@ -1,6 +1,7 @@
 import math
 from python_sim.resources import Bush
 import itertools
+import random
 
 #BUG muss ich die erkennen lassen wo die Border ist?
 #TODO NN Daten(net, genome) via JSON an Clemens schicken => für Visualisierung der "Brains"
@@ -11,7 +12,7 @@ class Organism:
     # Threadsafe d.h. wenn Instanzen in mehreren Threads erstellt werden bekommen sie trotzdem einzigartige IDs, bei Prozessen nicht
     _id_counter = itertools.count(start=1)
 
-    def __init__(self, x, y, angle, max_speed, max_turn_speed, vision_level, environment):
+    def __init__(self, x, y, angle, environment, org_config):
         self.id = next(Organism._id_counter)
         # Position
         self.x = x
@@ -20,22 +21,22 @@ class Organism:
         self.prev_y = self.y
 
         # Stats
-        self.max_energy = 100
+        self.max_energy = org_config["org_stats"]["max_energy"]
         self.energy = self.max_energy / 2
-        self.max_food = 100
+        self.max_food = org_config["org_stats"]["max_food"]
         self.food = self.max_food / 2
-        self.max_water = 100
+        self.max_water = org_config["org_stats"]["max_water"]
         self.water = self.max_water / 2
 
         # Movement
         self.angle = angle          # in radiant weil die meisten Mathematischen Funktionen radiant erwarten
-        self.max_speed = max_speed
+        self.max_speed = org_config["org_stats"]["max_speed"]
         self.speed = 0.0
-        self.max_turn_speed = max_turn_speed
+        self.max_turn_speed = math.radians(org_config["org_stats"]["max_turn_speed"])
         self.turn_speed = 0.0
 
         # Vision
-        self.vision_level = vision_level
+        self.vision_level = org_config["org_stats"]["vision_level"]
         self.set_vision()
 
         # Terrain
@@ -46,12 +47,22 @@ class Organism:
         # NEAT
         self.net = None
         self.genome = None
-        self.mate_range = 0.5
+        self.mate_range = org_config["org_stats"]["mate_range"]
         self.parentID_1 = None
         self.parentID_2 = None
-        self.mate_cooldown_max = 50
+        self.mate_cooldown_max = org_config["org_stats"]["mate_cooldown_max"]
         self.mate_cooldown = 0
-        self.reproduction_cost = 0.2 * self.max_energy
+        self.reproduction_cost = org_config["org_stats"]["reproduction_cost"]
+        self.fitness_signal = 0.0
+
+        # Metabolism
+        self.food_consumption = org_config["sim_stats"]["food_consumption"]
+        self.water_consumption = org_config["sim_stats"]["water_consumption"]
+        self.food_ok = org_config["sim_stats"]["food_threshold"]
+        self.water_ok = org_config["sim_stats"]["water_threshold"]
+        self.energy_gain = org_config["sim_stats"]["energy"]["std_gain"]
+        self.energy_loss = org_config["sim_stats"]["energy"]["std_loss"]
+        self.movement_loss_factor = org_config["sim_stats"]["energy"]["movement_loss_factor"]
 
         # Maybe
         self.size = 1
@@ -84,13 +95,16 @@ class Organism:
         - 1 = 10 Grad FOV, 20 Tile Range
         """
         # Werte in Radiant
-        max_fov = math.radians(360)
+        max_fov = math.radians(300)
         min_fov = math.radians(60)
+
+        max_range = 30.0
+        min_range = 10.0
 
         # Berechnung
         self.vision_fov = self.lerp(max_fov, min_fov, self.vision_level)
-        self.vision_range = self.lerp(5.0, 20.0, self.vision_level)
-        self.vision_area = 0.5 * (self.vision_range ** 2) * self.vision_fov
+        self.vision_range = self.lerp(min_range, max_range, self.vision_level)
+        self.vision_area = 0.5 * (self.vision_range ** 2) * self.vision_fov     #BUG schauen wegen der Formel
 
     def seen_objects(self):
         """
@@ -218,26 +232,17 @@ class Organism:
         - Wenn eines unter 20% liegt, bekommt er keine Energie.
         - Zusätzlich werden Food und Wasser leicht reduziert, um Verbrauch zu simulieren.
         """
-        # Verbrauch pro Tick
-        food_consumption = 0.2
-        water_consumption = 0.2
-
         # Ressourcen reduzieren
-        self.food = max(0.0, self.food - food_consumption)
-        self.water = max(0.0, self.water - water_consumption)
+        self.food = max(0.0, self.food - self.food_consumption)
+        self.water = max(0.0, self.water - self.water_consumption)
 
-        # Prüfen, ob genug Ressourcen vorhanden sind (>20% des Max)
-        food_ok = self.food > 0.25 * self.max_food
-        water_ok = self.water > 0.25 * self.max_water
-
-        if food_ok and water_ok:
-            energy_gain = 2  # Menge pro Tick, kann angepasst werden
-            self.energy = min(self.max_energy, self.energy + energy_gain)
+        if self.food > self.food_ok and self.water > self.water_ok:
+            self.energy = min(self.max_energy, self.energy + self.energy_gain)
         else:
             pass
 
         # Fixer verbrauch
-        self.energy = max(0, self.energy - 0.33)
+        self.energy = max(0, self.energy - self.energy_loss)
 
     def move(self):
         """
@@ -260,7 +265,7 @@ class Organism:
         distance = math.hypot(self.x - self.prev_x, self.y - self.prev_y)
 
         # Energieverlust proportional zur tatsächlichen Distanz
-        self.energy -= distance * 0.5
+        self.energy -= distance * self.movement_loss_factor
 
     def apply_nn_output(self, output):
         """
@@ -285,7 +290,7 @@ class Organism:
         self.move()
 
         # Trinken
-        if drink_signal > 0:
+        if drink_signal > 0.5:
             if self.is_on_water():
                 self.water = min(self.max_water, self.water + 50)
                 reward += 4.0
@@ -293,7 +298,7 @@ class Organism:
                 reward -= 1.0
 
         # Essen
-        if eat_signal > 0:
+        if eat_signal > 0.5:
             eaten = False
             # Wenn in der Nähe, Esse
             for bush in self.bushes:
@@ -307,13 +312,15 @@ class Organism:
             if not eaten:
                 reward -= 1.0
 
-        if mate_signal > 0:
+        if mate_signal > 0.5:
+            self.energy -= 0.5      #BUG da noch konkrete Werte finden, wenn maten was kostet dann lernen sies besser
+
             if self.org_can_mate():
                 self.want_mate = True
                 reward += 1.0
             else:
                 self.want_mate = False
-                reward -= 2.0
+                reward -= 1.0
         else:
             self.want_mate = False
 
@@ -331,6 +338,7 @@ class Organism:
         # 4. Sichtbare Ressourcen belohnen
         seen = self.seen_objects()
 
+        #BUG wie viel bekomt man da ungefähr...?, ergänzen um Orgs. maybe wegmachen
         if seen["food"]:
             dist_food, _ = self.get_closest(seen["food"])
             reward += (self.vision_range - dist_food) / self.vision_range
@@ -379,11 +387,9 @@ class Organism:
             #dist_food_norm = dist_food / self.vision_range
             dist_food_norm = min(math.log1p(dist_food) / math.log1p(self.vision_range), 1.0)    # Log für weniger Unterschied auf große Distanzen
             angle_food_norm = angle_food / math.pi
-            amount_food = min(len(seen["food"]) / self.vision_area, 1.0)
         else:
             dist_food_norm = 1.0  # nichts gesehen => maximale Distanz
             angle_food_norm = 0.0
-            amount_food = 0.0
 
         # Nähestes Wasser suchen
         if seen["water"]:
@@ -391,11 +397,9 @@ class Organism:
             #dist_water_norm = dist_water / self.vision_range
             dist_water_norm = min(math.log1p(dist_water) / math.log1p(self.vision_range), 1.0)
             angle_water_norm = angle_water / math.pi
-            amount_water = min(len(seen["water"]) / self.vision_area, 1.0)
         else:
             dist_water_norm = 1.0
             angle_water_norm = 0.0
-            amount_water = 0.0
 
         # Näheste Orgs suchen
         if seen["organisms"]:
@@ -403,11 +407,9 @@ class Organism:
             #dist_org_norm = dist_org / self.vision_range
             dist_org_norm = min(math.log1p(dist_org) / math.log1p(self.vision_range), 1.0)
             angle_org_norm = angle_org / math.pi
-            amount_org = min(len(seen["organisms"]) / self.vision_area, 1.0)
         else:
             dist_org_norm = 1.0
             angle_org_norm = 0.0
-            amount_org = 0.0
 
         if self.org_can_mate():
             can_mate = 1.0
@@ -415,6 +417,7 @@ class Organism:
             can_mate = 0.0
 
         return [
+            # Generell
             hungry,
             thirsty,
             energy,
@@ -422,15 +425,15 @@ class Organism:
             #angle_input,
             turn_input,
             can_mate,
+            # Food
             dist_food_norm,
             angle_food_norm,
-            amount_food,
+            # Water
             dist_water_norm,
             angle_water_norm,
-            amount_water,
+            # Orgs
             dist_org_norm,
-            angle_org_norm,
-            amount_org
+            angle_org_norm
         ]
 
     def org_can_mate(self):
@@ -439,11 +442,8 @@ class Organism:
         """
         #NOTE Maten braucht irgendeinen Cooldown hätt ich gesagt
         return (
-            self.food >= 0.4 * self.max_food and
-            self.water >= 0.4 * self.max_water and
-            self.energy >= 0.4 * self.max_energy and
+            self.energy >= 0.3 * self.max_energy and
             self.mate_cooldown == 0
-
         )
 
     def try_mate(self, partner):
@@ -470,6 +470,19 @@ class Organism:
 
         if dist > self.mate_range:
             return False
+
+        """
+        # probability für Selektion
+        f1 = max(0.0, self.genome.fitness)
+        f2 = max(0.0, partner.genome.fitness)
+
+        mating_prob = math.log1p(f1 + f2) / 5.0  # Skalierung anpassen
+        mating_prob = min(1.0, mating_prob)
+
+        # 0.0 -> 1.0
+        if random.random() > mating_prob:
+            return False
+        """
 
         return True
 
