@@ -20,7 +20,7 @@ import random
 logger = log.get_logger(__name__)
 
 class NEATSim:
-    def __init__(self, neat_config_path, app_config, pretrained_genoms=None):
+    def __init__(self, neat_config_path, app_config, pretrained_genomes=None):
         sim_config = app_config["simulation"]
         my_neat_config = app_config["neat"]
 
@@ -51,6 +51,7 @@ class NEATSim:
             neat.DefaultStagnation,
             neat_config_path
         )
+        self.pretrained_genomes = pretrained_genomes
 
         logger.info(
             f"NEAT Config loaded: pop_size={self.neat_config.pop_size}, "
@@ -66,14 +67,35 @@ class NEATSim:
 
     def init_population(self):
         """Erstellt initiale Organismen Bevölkerung"""
-        self.env.add_organisms(self.neat_config.pop_size)
+        pop_size = self.neat_config.pop_size
+        self.env.add_organisms(pop_size)
+
+        all_genomes = []
 
         if self.pretrained_genomes:
-            genomes = self.pretrained_genomes
-        else:
-            genomes = list(self.population.population.values())
+            logger.info(f"Using {len(self.pretrained_genomes)} pretrained genomes")
 
-        for org, genome in zip(self.env.organisms, genomes):
+            # pretrained zuerst rein
+            all_genomes.extend(self.pretrained_genomes)
+
+            # dann auffüllen durch RECYCLING (Option 2)
+            while len(all_genomes) < pop_size:
+                g = random.choice(self.pretrained_genomes)
+
+                # WICHTIG: COPY machen → sonst teilen sich mehrere Orgs das gleiche Genome!
+                new_g = self.neat_config.genome_type(random.randint(0, 10**9))
+                new_g.configure_crossover(g, g, self.neat_config.genome_config)  # Clone
+                new_g.mutate(self.neat_config.genome_config)  # kleine Variation
+
+                all_genomes.append(new_g)
+
+        else:
+            all_genomes = list(self.population.population.values())
+
+        # Safety (falls zu viele pretrained)
+        all_genomes = all_genomes[:pop_size]
+
+        for org, genome in zip(self.env.organisms, all_genomes):
             org.genome = genome
             org.net = neat.nn.RecurrentNetwork.create(genome, self.neat_config)
             genome.fitness = 0.0

@@ -10,6 +10,7 @@ import python_sim.logger_setup as log
 from python_sim.state_builder import StateBuilder
 from python_sim.neat_pre_train import run_neat
 
+#BUG Pre Train = Essen, ich muss schauen dass ich ihnen in RT Fortpflanzen beibringe
 #FIXME das JSON anpassen dass GoDot massiv viel empfangen kann
 #FIXME Sinnvolle Interne Werte setzen
 #FIXME schauen welche Graphen wir alle machen
@@ -42,7 +43,7 @@ def evaluator_process(command_queue, snapshot_queue, config):
     rt_sim = NEATSim(
         neat_config_path=neat_conf_file,
         app_config=config,
-        pretrained_genoms=genomes
+        pretrained_genomes=genomes
     )
 
     running = True                      # Solange der Prozess läuft

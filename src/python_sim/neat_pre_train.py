@@ -107,7 +107,7 @@ def run_neat(neat_config_path, app_config):
 
     # VIBECODE start
     # Top + Random mischen
-    all_genomes = list(population.population.values())
+    all_genomes = list(g for g in population.population.values() if g.fitness is not None)
 
     # sortieren nach fitness
     all_genomes.sort(key=lambda g: g.fitness, reverse=True)

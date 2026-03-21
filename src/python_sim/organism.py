@@ -292,8 +292,11 @@ class Organism:
         # Trinken
         if drink_signal > 0.5:
             if self.is_on_water():
+                water_before = self.water
                 self.water = min(self.max_water, self.water + 50)
-                reward += 4.0
+                gained_water = self.water - water_before
+
+                reward += gained_water * 0.1 + 0.5
             else:
                 reward -= 1.0
 
@@ -304,9 +307,13 @@ class Organism:
             for bush in self.bushes:
                 if abs(bush.x - self.x) < 1 and abs(bush.y - self.y) < 1:
                     harvested = bush.harvest()
+
+                    food_before = self.food
                     self.food = min(self.max_food, self.food + (harvested * bush.nutrition))
+                    gained_food = self.food - food_before
                     eaten = True
-                    reward += 5.0
+
+                    reward += gained_food * 0.15 + 0.75
                     break
 
             if not eaten:
